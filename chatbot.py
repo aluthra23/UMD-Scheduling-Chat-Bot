@@ -17,14 +17,14 @@ def load_vector_store(api_key):
             vector_store = create_vector_store(api_key)
 
 
-def chatbot_response(query, api_key, k=3):
+def chatbot_response(query, api_key, k=5):
     load_vector_store(api_key)
 
     # Perform similarity search
     docs = vector_store.similarity_search(query, k=k)
     context = "\n\n".join([doc.page_content for doc in docs])
     print(context)
-    prompt = f"Use the following information to answer the query.\n\n{context}\n\nQuery: {query}\n\nAnswer:"
+    prompt = f"Use the following information to answer the query.\n\n{context}\n\nQuery: {query}\n\n"
 
     client = OpenAI(api_key=api_key)
 

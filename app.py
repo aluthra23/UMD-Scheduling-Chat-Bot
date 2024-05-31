@@ -8,12 +8,19 @@ with st.sidebar:
 st.title("UMD Class Schedule Chatbot")
 st.write("Ask me anything about UMD classes and schedules!")
 
-user_input = st.text_input("Your Question:")
 
-if not openai_api_key:
-    st.info("Please add your OpenAI API key to continue.")
-elif user_input:
-    with st.spinner("Getting response..."):
-        response = chatbot.chatbot_response(user_input, openai_api_key)
-    st.write("Answer:")
-    st.write(response)
+if "messages" not in st.session_state:
+    st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
+
+for msg in st.session_state.messages:
+    st.chat_message(msg["role"]).write(msg["content"])
+
+if user_input := st.chat_input():
+    if not openai_api_key:
+        st.info("Please add your OpenAI API key to continue.")
+        st.stop()
+    elif user_input:
+        with st.spinner("Getting response..."):
+            response = chatbot.chatbot_response(user_input, openai_api_key)
+        st.write("Here's what I think:")
+        st.write(response)
