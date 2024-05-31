@@ -17,7 +17,7 @@ def load_vector_store(api_key):
             vector_store = create_vector_store(api_key)
 
 
-def chatbot_response(query, api_key, k=45):
+def chatbot_response(query, api_key, k=35):
     load_vector_store(api_key)
 
     # Perform similarity search
