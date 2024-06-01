@@ -53,7 +53,7 @@ class VectorStoreHandler:
 
         return self.vector_store
 
-    def similarity_search(self, query, k=5):
+    def similarity_search(self, query, k):
         if self.vector_store is None:
             self.load_vector_store()
         return self.vector_store.similarity_search(query, k=k)

@@ -4,7 +4,7 @@ from vector_database import VectorStoreHandler
 
 def chatbot_response(query, api_key, k=50):
     vector_store_handler = VectorStoreHandler(api_key)
-    docs = vector_store_handler.similarity_search(query, k=k)
+    docs = vector_store_handler.similarity_search(query=query, k=k)
 
     if not docs:
         return "I'm sorry, but I couldn't find any information related to your query. Please try again with different keywords."
