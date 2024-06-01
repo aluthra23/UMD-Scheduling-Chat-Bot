@@ -1,35 +1,27 @@
-import os
-from openai import OpenAI
-from langchain.vectorstores import FAISS
-from vector_database import create_vector_store
-from langchain.embeddings import OpenAIEmbeddings
-
-vector_store = None
+import openai
+from vector_database import VectorStoreHandler
 
 
-def load_vector_store(api_key):
-    global vector_store
-    if vector_store is None:
-        embeddings = OpenAIEmbeddings(api_key=api_key)
-        try:
-            vector_store = FAISS.load_local("umd_vector_store", embeddings, allow_dangerous_deserialization=True)
-        except FileNotFoundError:
-            vector_store = create_vector_store(api_key)
+def chatbot_response(query, api_key, k=50):
+    vector_store_handler = VectorStoreHandler(api_key)
+    docs = vector_store_handler.similarity_search(query, k=k)
 
+    if not docs:
+        return "I'm sorry, but I couldn't find any information related to your query. Please try again with different keywords."
 
-def chatbot_response(query, api_key, k=35):
-    load_vector_store(api_key)
-
-    # Perform similarity search
-    docs = vector_store.similarity_search(query, k=k)
     context = "\n\n".join([doc.page_content for doc in docs])
-    print(context)
-    prompt = f"Use the following information to answer the query.\n\n{context}\n\nQuery: {query}\n\n"
 
-    client = OpenAI(api_key=api_key)
+    prompt = (
+        f"You are an assistant for answering questions about University of Maryland classes and schedules. "
+        f"Use the following information to answer the query.\n\n{context}\n\n"
+        f"Query: {query}\n\n"
+        f"Provide a detailed and accurate response based on the information provided."
+    )
+
+    client = openai.OpenAI(api_key=api_key)
 
     response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": prompt},
@@ -37,4 +29,5 @@ def chatbot_response(query, api_key, k=35):
         max_tokens=200,
         temperature=0.5
     )
+
     return response.choices[0].message.content.strip()
