@@ -1,9 +1,6 @@
 import openai
 from vector_database import VectorStoreHandler
 
-client = None
-current_api_key = None
-
 
 def chatbot_response(query, api_key, k=50):
     """
@@ -35,12 +32,7 @@ def chatbot_response(query, api_key, k=50):
         f"Provide a detailed and accurate response based on the information provided."
     )
 
-    global client
-    global current_api_key
-
-    if (client is None) or (api_key != current_api_key):
-        current_api_key = api_key
-        client = openai.OpenAI(api_key=api_key)  # Initializes an OpenAI client using the provided API key
+    client = openai.OpenAI(api_key=api_key)  # Initializes an OpenAI client using the provided API key
 
     # Sends a request to OpenAI’s chat completion endpoint
     response = client.chat.completions.create(
