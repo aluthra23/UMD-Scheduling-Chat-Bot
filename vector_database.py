@@ -1,6 +1,8 @@
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.schema import Document
+
+import globals
 from data_preprocessing import load_datasets
 from datetime import datetime, timedelta
 import os
@@ -24,9 +26,7 @@ class VectorStoreHandler:
         self.api_key = api_key # Stores API key
         self.vector_store = None # Holds the FAISS vector store
         self.embeddings = OpenAIEmbeddings(api_key=api_key) # An embeddings model for generating text embeddings.
-        self.timer_file = "timer.txt"   # Filepath to file that tracks the last update to our vector store
-                                        # (updates every one hour)
-        self.vector_store_path = "umd_vector_store" # Filepath where FAISS vector store is saved
+        self.vector_store_path = "umd_vector_store"  # Filepath where FAISS vector store is saved
 
     def load_vector_store(self):
         """
@@ -35,7 +35,7 @@ class VectorStoreHandler:
         :return: a vector store with the UMD coursework data
         """
 
-        if not self.vector_store_needs_update():
+        if globals.isEmbeddingsModelUpdated:
             # Loads the currently stored version of the vector store if no update needed
             self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
                                                  embeddings=self.embeddings,
@@ -43,21 +43,6 @@ class VectorStoreHandler:
         else:
             # Creates a new vector store if an updated is needed
             self.vector_store = self.create_vector_store()
-
-    def vector_store_needs_update(self) -> bool:
-        """
-        Determines whether our vector store needs an update
-
-        :return: True or False depending on whether our vector store needs an update
-        """
-
-        if not os.path.exists(self.timer_file):
-            return True # Returns true if the timer.txt file doesn't exist on our disk
-
-        with open(self.timer_file, "r") as file:
-            last_updated = datetime.fromisoformat(file.read().strip())  # Reads current time stored in timer.txt
-
-        return datetime.now() - last_updated > timedelta(hours=1) # Checks if time passed is greater than 1 hour
 
     def create_vector_store(self):
         """
@@ -67,31 +52,25 @@ class VectorStoreHandler:
         :return: a vector store with the updated data
         """
 
-        # Updates umd_schedule_of_classes_courses.csv with new data from Schedule of Classes website
-        main_soc_scraper.update_current_semester_coursework_data(
-            file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv"
-        )
+        with globals.universal_lock:
+            # Reads and loads the respective datasets as Pandas dataframes
+            courses, catalog, prefixes, gen_eds = load_datasets()
 
-        # Reads and loads the respective datasets as Pandas dataframes
-        courses, catalog, prefixes, gen_eds = load_datasets()
+            # Converts each dataset into a list of Document objects
+            course_docs = self.create_documents(courses, "schedule")
+            catalog_docs = self.create_documents(catalog, "catalog")
+            prefix_docs = self.create_documents(prefixes, "prefix")
+            gen_eds_docs = self.create_documents(gen_eds, "gen_ed")
 
-        # Converts each dataset into a list of Document objects
-        course_docs = self.create_documents(courses, "schedule")
-        catalog_docs = self.create_documents(catalog, "catalog")
-        prefix_docs = self.create_documents(prefixes, "prefix")
-        gen_eds_docs = self.create_documents(gen_eds, "gen_ed")
+            # Merges all the documents
+            all_documents = course_docs + catalog_docs + prefix_docs + gen_eds_docs
 
-        # Merges all the documents
-        all_documents = course_docs + catalog_docs + prefix_docs + gen_eds_docs
+            self.vector_store = FAISS.from_documents(all_documents, self.embeddings) # Builds vector store
+            self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
 
-        self.vector_store = FAISS.from_documents(all_documents, self.embeddings) # Builds vector store
-        self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
+            globals.isEmbeddingsModelUpdated = True
 
-        # Writes the current time to the timer.txt file
-        with open(self.timer_file, "w") as file:
-            file.write(datetime.now().isoformat())
-
-        return self.vector_store # Returns the newly created vector store
+            return self.vector_store  # Returns the newly created vector store
 
     def similarity_search(self, query, k):
         """

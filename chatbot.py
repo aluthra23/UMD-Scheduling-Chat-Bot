@@ -40,7 +40,7 @@ def chatbot_response(query, api_key, k=50):
 
     if (client is None) or (api_key != current_api_key):
         current_api_key = api_key
-        client = openai.OpenAI(api_key=api_key) # Initializes an OpenAI client using the provided API key
+        client = openai.OpenAI(api_key=api_key)  # Initializes an OpenAI client using the provided API key
 
     # Sends a request to OpenAI’s chat completion endpoint
     response = client.chat.completions.create(
