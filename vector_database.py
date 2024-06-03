@@ -4,56 +4,122 @@ from langchain.schema import Document
 from data_preprocessing import load_datasets
 from datetime import datetime, timedelta
 import os
+from schedule_of_classes_scraper import main_soc_scraper
 
 
 class VectorStoreHandler:
+    """
+    Create a FAISS vector store with additional properties to help load the vector store and determine
+    when to update our datasets
+    """
+
     def __init__(self, api_key):
-        self.api_key = api_key
-        self.vector_store = None
-        self.embeddings = OpenAIEmbeddings(api_key=api_key)
-        self.timer_file = "timer.txt"
-        self.vector_store_path = "umd_vector_store"
+        """
+        Initializes a VectorStoreHandler which has a given api_key, stores a vector store, stores file
+        paths to the timer files and vector store files, and also initializes an OpenAIEmbeddings model
+        for generating text embeddings
+
+        :param api_key: stores api_keys to all of our models and initializes an OpenAIEmbeddings model
+        """
+        self.api_key = api_key # Stores API key
+        self.vector_store = None # Holds the FAISS vector store
+        self.embeddings = OpenAIEmbeddings(api_key=api_key) # An embeddings model for generating text embeddings.
+        self.timer_file = "timer.txt"   # Filepath to file that tracks the last update to our vector store
+                                        # (updates every one hour)
+        self.vector_store_path = "umd_vector_store" # Filepath where FAISS vector store is saved
 
     def load_vector_store(self):
+        """
+        Loads the current vector store or creates a new vector store if an update is required
+
+        :return: a vector store with the UMD coursework data
+        """
+
         if not self.vector_store_needs_update():
-            self.vector_store = FAISS.load_local(self.vector_store_path, self.embeddings,
+            # Loads the currently stored version of the vector store if no update needed
+            self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
+                                                 embeddings=self.embeddings,
                                                  allow_dangerous_deserialization=True)
         else:
+            # Creates a new vector store if an updated is needed
             self.vector_store = self.create_vector_store()
 
-    def vector_store_needs_update(self):
+    def vector_store_needs_update(self) -> bool:
+        """
+        Determines whether our vector store needs an update
+
+        :return: True or False depending on whether our vector store needs an update
+        """
+
         if not os.path.exists(self.timer_file):
-            return True
+            return True # Returns true if the timer.txt file doesn't exist on our disk
 
         with open(self.timer_file, "r") as file:
-            last_updated = datetime.fromisoformat(file.read().strip())
+            last_updated = datetime.fromisoformat(file.read().strip())  # Reads current time stored in timer.txt
 
-        return datetime.now() - last_updated > timedelta(hours=1)
-
-    def create_documents(self, df, source_name):
-        documents = []
-        for _, row in df.iterrows():
-            content = " ".join([f"{col}: {row[col]}" for col in df.columns])
-            documents.append(Document(page_content=content, metadata={"source": source_name}))
-        return documents
+        return datetime.now() - last_updated > timedelta(hours=1) # Checks if time passed is greater than 1 hour
 
     def create_vector_store(self):
+        """
+        Updates the current coursework data from the Schedule of Classes Website, and creates and returns
+        a new vector store with the updated datasets
+
+        :return: a vector store with the updated data
+        """
+
+        # Updates umd_schedule_of_classes_courses.csv with new data from Schedule of Classes website
+        main_soc_scraper.update_current_semester_coursework_data(
+            file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv"
+        )
+
+        # Reads and loads the respective datasets as Pandas dataframes
         courses, catalog, prefixes, gen_eds = load_datasets()
+
+        # Converts each dataset into a list of Document objects
         course_docs = self.create_documents(courses, "schedule")
         catalog_docs = self.create_documents(catalog, "catalog")
         prefix_docs = self.create_documents(prefixes, "prefix")
         gen_eds_docs = self.create_documents(gen_eds, "gen_ed")
+
+        # Merges all the documents
         all_documents = course_docs + catalog_docs + prefix_docs + gen_eds_docs
 
-        self.vector_store = FAISS.from_documents(all_documents, self.embeddings)
-        self.vector_store.save_local(self.vector_store_path)
+        self.vector_store = FAISS.from_documents(all_documents, self.embeddings) # Builds vector store
+        self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
 
+        # Writes the current time to the timer.txt file
         with open(self.timer_file, "w") as file:
             file.write(datetime.now().isoformat())
 
-        return self.vector_store
+        return self.vector_store # Returns the newly created vector store
 
     def similarity_search(self, query, k):
+        """
+        Performs a similarity search on the vector store to find documents similar to the query.
+
+        :param query: string containing the prompt entered by the user
+        :param k: a number to indicate we want to find the top 'k' documents similar to our query
+        :return: a list of documents that are similar to the entered query
+        """
+
         if self.vector_store is None:
+            # Loads a vector store if it doesn't exist
             self.load_vector_store()
-        return self.vector_store.similarity_search(query, k=k)
+        return self.vector_store.similarity_search(query, k=k) # Finds top 'k' documents related to query
+
+
+    def create_documents(self, df, source_name):
+        """
+        Converts a DataFrame into a list of Document objects for embedding and storage in the vector store
+
+        :param df: refers to a dataframe
+        :param source_name: a description of the data provided
+        :return: a list of documents that will be used to build a vector store
+        """
+
+        documents = []  # Stores list of Documents storing the dataframe elements to be returned
+        for _, row in df.iterrows():
+            # Concatenate each property for each element which is appended into the list of documents
+            content = " ".join([f"{col}: {row[col]}" for col in df.columns])
+            documents.append(Document(page_content=content, metadata={"source": source_name}))
+        return documents
