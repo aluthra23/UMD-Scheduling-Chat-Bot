@@ -6,6 +6,9 @@ import globals
 from schedule_of_classes_scraper import main_soc_scraper
 import time
 import threading
+from streamlit.runtime.scriptrunner import add_script_run_ctx
+from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
+
 
 # Streamlit UI
 with st.sidebar:
@@ -68,4 +71,7 @@ def check_update_needed():
 
 # Start a separate thread to check for updates in the background
 update_thread = threading.Thread(target=check_update_needed)
+ctx = get_script_run_ctx()
+add_script_run_ctx(thread=update_thread, ctx=ctx)
 update_thread.start()
+

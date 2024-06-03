@@ -32,19 +32,22 @@ def chatbot_response(query, api_key, k=50):
         f"Provide a detailed and accurate response based on the information provided."
     )
 
-    client = openai.OpenAI(api_key=api_key)  # Initializes an OpenAI client using the provided API key
+    try:
+        client = openai.OpenAI(api_key=api_key)  # Initializes an OpenAI client using the provided API key
 
-    # Sends a request to OpenAI’s chat completion endpoint
-    response = client.chat.completions.create(
-        model="gpt-4o",  # Specifies the model to use (Can change this)
-        messages=[
-            {"role": "system", "content": "You are an assistant for answering questions about University of "
-                                          "Maryland classes and schedules, who writes concisely and clearly! "
-                                          "Be relevant and to the point."},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.5  # Controls the randomness of the output
-    )
+        # Sends a request to OpenAI’s chat completion endpoint
+        response = client.chat.completions.create(
+            model="gpt-3.5-turbo",  # Specifies the model to use (Can change this)
+            messages=[
+                {"role": "system", "content": "You are an assistant for answering questions about University of "
+                                              "Maryland classes and schedules, who writes concisely and clearly! "
+                                              "Be relevant and to the point."},
+                {"role": "user", "content": prompt},
+            ],
+            temperature=0.5  # Controls the randomness of the output
+        )
 
-    # Extracts the content of the first message in the response choices
-    return response.choices[0].message.content.strip()
+        # Extracts the content of the first message in the response choices
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
