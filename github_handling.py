@@ -5,9 +5,8 @@ import time
 import streamlit as st
 
 # using an access token
-# GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
-auth = Auth.Token("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")
-# auth = Auth.Token(GITHUB_TOKEN)
+GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
+auth = Auth.Token(GITHUB_TOKEN)
 
 
 def update_file_on_github(filepath):
