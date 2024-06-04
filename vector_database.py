@@ -3,10 +3,13 @@ import threading
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.schema import Document
+from streamlit.runtime.scriptrunner import add_script_run_ctx
+from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
 
 import github_handling
 from github_handling import update_file_on_github
 import globals
+from globals import embeddingModelBeingUpdated
 from data_preprocessing import load_datasets
 from datetime import datetime, timedelta
 import os
@@ -39,14 +42,23 @@ class VectorStoreHandler:
         :return: a vector store with the UMD coursework data
         """
 
-        if globals.isEmbeddingsModelUpdated:
+        if embeddingModelBeingUpdated.locked():
+            with embeddingModelBeingUpdated:  # Waits for embeddingModelBeingUpdated lock to be released
+                pass
+
+            self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
+                                                 embeddings=self.embeddings,
+                                                 allow_dangerous_deserialization=True)
+        elif globals.isEmbeddingsModelUpdated:
             # Loads the currently stored version of the vector store if no update needed
             self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
                                                  embeddings=self.embeddings,
                                                  allow_dangerous_deserialization=True)
+
         else:
-            # Creates a new vector store if an updated is needed
-            self.vector_store = self.create_vector_store()
+            with embeddingModelBeingUpdated:
+                # Creates a new vector store if an updated is needed
+                self.vector_store = self.create_vector_store()
 
     def create_vector_store(self):
         """
@@ -74,8 +86,17 @@ class VectorStoreHandler:
 
             globals.isEmbeddingsModelUpdated = True
 
-            thread_faiss = threading.Thread(target=update_file_on_github, args=("umd_vector_store/index.faiss",))
-            thread_pkl = threading.Thread(target=update_file_on_github, args=("umd_vector_store/index.pkl",))
+            thread_faiss = threading.Thread(target=update_file_on_github,
+                                            args=("umd_vector_store/index.faiss",),
+                                            daemon=True)
+            thread_pkl = threading.Thread(target=update_file_on_github,
+                                          args=("umd_vector_store/index.pkl",),
+                                          daemon=True)
+
+            # Add Streamlit context to threads
+            ctx = get_script_run_ctx()
+            add_script_run_ctx(thread=thread_faiss, ctx=ctx)
+            add_script_run_ctx(thread=thread_pkl, ctx=ctx)
 
             thread_faiss.start()
             thread_pkl.start()

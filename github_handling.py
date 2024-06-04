@@ -3,6 +3,7 @@ from github import Github
 from github import Auth
 import time
 import streamlit as st
+from globals import github_lock
 
 # using an access token
 GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
@@ -10,21 +11,18 @@ auth = Auth.Token(GITHUB_TOKEN)
 
 
 def update_file_on_github(filepath):
-    # filepath = "umd_vector_store/index.faiss"
-    with open(filepath, "rb") as file:
-        file_content = file.read()
+    with github_lock:
+        with open(filepath, "rb") as file:
+            file_content = file.read()
 
-        start_time_read = time.time()
+            try:
+                g = Github(auth=auth, timeout=300)
+                repo = g.get_repo("aluthra23/UMD-Scheduling-Chat-Bot")
 
-        g = Github(auth=auth, timeout=120)
-        repo = g.get_repo("aluthra23/UMD-Scheduling-Chat-Bot")
+                contents = repo.get_contents(filepath)
 
-        contents = repo.get_contents(filepath)
+                repo.update_file(filepath, "commit", file_content, contents.sha, branch='main')
 
-        repo.update_file(filepath, "commit", file_content, contents.sha, branch='main')
-
-        end_time_read = time.time()
-        print(f"Time taken to upload the file: {end_time_read - start_time_read} seconds")
-
-        # To close connections after use
-        g.close()
+                g.close()
+            except:
+                pass
