@@ -32,5 +32,5 @@ The UMD Class Schedule Chatbot is an AI-powered assistant designed to help stude
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/your-username/umd-class-schedule-chatbot.git
+   git clone https://github.com/aluthra23/UMD-Scheduling-Chat-Bot.git
    cd umd-class-schedule-chatbot
