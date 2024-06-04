@@ -2,7 +2,7 @@
 
 ## Overview
 
-The UMD Scheduling Chatbot is an AI-powered assistant designed to help students at the University of Maryland find detailed information about courses and schedules. This project leverages OpenAI's GPT-4o model and a custom vector store built with FAISS to provide accurate and timely responses to user queries about UMD classes. For a live demo, visit [UMD Chat Bot](https://umd-chat-bot.streamlit.app/).
+The UMD Scheduling Chatbot is an AI-powered assistant designed to help students at the University of Maryland find detailed information about courses and schedules. This project leverages OpenAI's GPT-40 model and a custom vector store built with FAISS to provide accurate and timely responses to user queries about UMD classes. For a live demo, visit [UMD Chat Bot](https://umd-chat-bot.streamlit.app/).
 
 [![Scheduling Chat Bot Demo](https://img.youtube.com/vi/KEKWtafWjeQ/0.jpg)](https://youtu.be/KEKWtafWjeQ)
 
@@ -24,7 +24,7 @@ The UMD Scheduling Chatbot is an AI-powered assistant designed to help students 
 
 - **app.py**: The main application file that sets up the Streamlit interface and handles user interactions.
 - **chatbot.py**: Contains the logic for generating responses using the OpenAI API and the vector store. This file orchestrates the conversation flow and ensures seamless interaction with users.
-- **vector_database.py**: Manages the creation, loading, and updating of the vector store. This component ensures that the chatbot has access to the latest scheduling information and can provide accurate responses. FAISS is used extensively within this module to build and manage the vector store efficiently.
+- **vector_store.py**: Manages the creation, loading, and updating of the vector store. This component ensures that the chatbot has access to the latest scheduling information and can provide accurate responses. FAISS is used extensively within this module to build and manage the vector store efficiently.
 - **data_preprocessing.py**: Handles the loading and preprocessing of the datasets used to create the vector store. This file ensures that the data is formatted and indexed correctly for efficient searching.
 - **timer.txt**: A file used to track the last update time of the vector store. This ensures that the vector store is regularly updated with the latest scheduling information.
 
