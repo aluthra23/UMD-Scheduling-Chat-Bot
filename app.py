@@ -1,3 +1,4 @@
+import openai
 import streamlit as st
 import chatbot
 from datetime import datetime, timedelta
@@ -39,7 +40,13 @@ if user_input := st.chat_input():
         with st.spinner(spinner_text):
             st.session_state.messages.append({"role": "user", "content": user_input})
             st.chat_message("user").write(user_input)
-            response = chatbot.chatbot_response(user_input, openai_api_key)
+            try:
+                response = chatbot.chatbot_response(user_input, openai_api_key)
+            except openai.AuthenticationError:
+                response = "Invalid OpenAI API key. Please enter a valid key."
+            except Exception as e:
+                response = f"An error occurred. Try again."
+
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.chat_message("assistant").write(response)
 
