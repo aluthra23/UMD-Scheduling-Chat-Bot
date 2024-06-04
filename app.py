@@ -77,8 +77,8 @@ def check_update_needed():
                 file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv"
             )
 
-            update_file_on_github("timer.txt")
-            update_file_on_github("schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv")
+            # update_file_on_github("timer.txt")
+            # update_file_on_github("schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv")
 
 
 # Start a separate thread to check for updates in the background
@@ -86,4 +86,3 @@ update_thread = threading.Thread(target=check_update_needed, daemon=True)
 ctx = get_script_run_ctx()
 add_script_run_ctx(thread=update_thread, ctx=ctx)
 update_thread.start()
-

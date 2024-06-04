@@ -9,7 +9,6 @@ from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx
 import github_handling
 from github_handling import update_file_on_github
 import globals
-from globals import embeddingModelBeingUpdated
 from data_preprocessing import load_datasets
 from datetime import datetime, timedelta
 import os
@@ -42,23 +41,18 @@ class VectorStoreHandler:
         :return: a vector store with the UMD coursework data
         """
 
-        if embeddingModelBeingUpdated.locked():
-            with embeddingModelBeingUpdated:  # Waits for embeddingModelBeingUpdated lock to be released
-                pass
+        globals.universal_lock.acquire()
 
-            self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
-                                                 embeddings=self.embeddings,
-                                                 allow_dangerous_deserialization=True)
-        elif globals.isEmbeddingsModelUpdated:
+        if globals.isEmbeddingsModelUpdated:
+            globals.universal_lock.release()
             # Loads the currently stored version of the vector store if no update needed
             self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
                                                  embeddings=self.embeddings,
                                                  allow_dangerous_deserialization=True)
-
         else:
-            with embeddingModelBeingUpdated:
-                # Creates a new vector store if an updated is needed
-                self.vector_store = self.create_vector_store()
+            # Creates a new vector store if an updated is needed
+            self.vector_store = self.create_vector_store()
+            globals.universal_lock.release()
 
     def create_vector_store(self):
         """
@@ -68,40 +62,39 @@ class VectorStoreHandler:
         :return: a vector store with the updated data
         """
 
-        with globals.universal_lock:
-            # Reads and loads the respective datasets as Pandas dataframes
-            courses, catalog, prefixes, gen_eds = load_datasets()
+        # Reads and loads the respective datasets as Pandas dataframes
+        courses, catalog, prefixes, gen_eds = load_datasets()
 
-            # Converts each dataset into a list of Document objects
-            course_docs = self.create_documents(courses, "schedule")
-            catalog_docs = self.create_documents(catalog, "catalog")
-            prefix_docs = self.create_documents(prefixes, "prefix")
-            gen_eds_docs = self.create_documents(gen_eds, "gen_ed")
+        # Converts each dataset into a list of Document objects
+        course_docs = self.create_documents(courses, "schedule")
+        catalog_docs = self.create_documents(catalog, "catalog")
+        prefix_docs = self.create_documents(prefixes, "prefix")
+        gen_eds_docs = self.create_documents(gen_eds, "gen_ed")
 
-            # Merges all the documents
-            all_documents = course_docs + catalog_docs + prefix_docs + gen_eds_docs
+        # Merges all the documents
+        all_documents = course_docs + catalog_docs + prefix_docs + gen_eds_docs
 
-            self.vector_store = FAISS.from_documents(all_documents, self.embeddings) # Builds vector store
-            self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
+        self.vector_store = FAISS.from_documents(all_documents, self.embeddings) # Builds vector store
+        self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
 
-            globals.isEmbeddingsModelUpdated = True
+        globals.isEmbeddingsModelUpdated = True
 
-            thread_faiss = threading.Thread(target=update_file_on_github,
-                                            args=("umd_vector_store/index.faiss",),
-                                            daemon=True)
-            thread_pkl = threading.Thread(target=update_file_on_github,
-                                          args=("umd_vector_store/index.pkl",),
-                                          daemon=True)
+        # thread_faiss = threading.Thread(target=update_file_on_github,
+        #                                 args=("umd_vector_store/index.faiss",),
+        #                                 daemon=True)
+        # thread_pkl = threading.Thread(target=update_file_on_github,
+        #                               args=("umd_vector_store/index.pkl",),
+        #                               daemon=True)
+        #
+        # # Add Streamlit context to threads
+        # ctx = get_script_run_ctx()
+        # add_script_run_ctx(thread=thread_faiss, ctx=ctx)
+        # add_script_run_ctx(thread=thread_pkl, ctx=ctx)
+        #
+        # thread_faiss.start()
+        # thread_pkl.start()
 
-            # Add Streamlit context to threads
-            ctx = get_script_run_ctx()
-            add_script_run_ctx(thread=thread_faiss, ctx=ctx)
-            add_script_run_ctx(thread=thread_pkl, ctx=ctx)
-
-            thread_faiss.start()
-            thread_pkl.start()
-
-            return self.vector_store  # Returns the newly created vector store
+        return self.vector_store  # Returns the newly created vector store
 
     def similarity_search(self, query, k):
         """

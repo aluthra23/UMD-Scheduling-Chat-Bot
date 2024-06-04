@@ -11,7 +11,19 @@ auth = Auth.Token(GITHUB_TOKEN)
 
 
 def update_file_on_github(filepath):
+    g = Github(auth=auth, timeout=300)
+    repo = g.get_repo("aluthra23/UMD-Scheduling-Chat-Bot")
+
     with github_lock:
+        try:
+            repo.get_contents("logging")
+            return
+        except:
+            try:
+                repo.create_file("logging", "Create logging file", "Process started.", branch='main')
+            except Exception as e:
+                return
+
         with open(filepath, "rb") as file:
             file_content = file.read()
 
@@ -21,8 +33,14 @@ def update_file_on_github(filepath):
 
                 contents = repo.get_contents(filepath)
 
-                repo.update_file(filepath, "commit", file_content, contents.sha, branch='main')
+                repo.update_file(filepath, f"Updated {str(filepath).split("/")[-1]}", file_content, contents.sha, branch='main')
 
                 g.close()
             except:
                 pass
+            finally:
+                try:
+                    logging_file = repo.get_contents("logging")
+                    repo.delete_file("logging", "Delete logging file", logging_file.sha, branch='main')
+                except Exception as e:
+                    print(f"Failed to delete logging file: {e}")
