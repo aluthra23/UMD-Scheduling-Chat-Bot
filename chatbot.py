@@ -37,7 +37,7 @@ def chatbot_response(query, api_key, k=50):
 
         # Sends a request to OpenAI’s chat completion endpoint
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",  # Specifies the model to use (Can change this)
+            model="gpt-4o",  # Specifies the model to use (Can change this)
             messages=[
                 {"role": "system", "content": "You are an assistant for answering questions about University of "
                                               "Maryland classes and schedules, who writes concisely and clearly! "
