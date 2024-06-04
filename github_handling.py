@@ -21,7 +21,7 @@ def update_file_on_github(filepath):
         except:
             try:
                 repo.create_file("logging", "Create logging file", "Process started.", branch='main')
-            except Exception as e:
+            except:
                 return
 
         with open(filepath, "rb") as file:
@@ -33,7 +33,8 @@ def update_file_on_github(filepath):
 
                 contents = repo.get_contents(filepath)
 
-                repo.update_file(filepath, f"Updated {str(filepath).split("/")[-1]}", file_content, contents.sha, branch='main')
+                repo.update_file(filepath, f"Updated {str(filepath).split("/")[-1]}", file_content, contents.sha,
+                                 branch='main')
 
                 g.close()
             except:
@@ -42,5 +43,5 @@ def update_file_on_github(filepath):
                 try:
                     logging_file = repo.get_contents("logging")
                     repo.delete_file("logging", "Delete logging file", logging_file.sha, branch='main')
-                except Exception as e:
-                    print(f"Failed to delete logging file: {e}")
+                except:
+                    pass
