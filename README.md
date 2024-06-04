@@ -2,7 +2,7 @@
 
 ## Overview
 
-The UMD Scheduling Chatbot is an AI-powered assistant designed to help students at the University of Maryland find detailed information about courses and schedules. This project leverages OpenAI's GPT-40 model and a custom vector store built with FAISS to provide accurate and timely responses to user queries about UMD classes. For a live demo, visit [UMD Chat Bot](https://umd-chat-bot.streamlit.app/).
+The UMD Scheduling Chatbot is an AI-powered assistant designed to help students at the University of Maryland find detailed information about courses and schedules. This project leverages OpenAI's GPT-4o model and a custom vector store built with FAISS to provide accurate and timely responses to user queries about UMD classes. For a live demo, visit [UMD Chat Bot](https://umd-chat-bot.streamlit.app/).
 
 [![Scheduling Chat Bot Demo](https://img.youtube.com/vi/KEKWtafWjeQ/0.jpg)](https://youtu.be/KEKWtafWjeQ)
 
