@@ -1,7 +1,11 @@
+import threading
+
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.schema import Document
 
+import github_handling
+from github_handling import update_file_on_github
 import globals
 from data_preprocessing import load_datasets
 from datetime import datetime, timedelta
@@ -69,6 +73,12 @@ class VectorStoreHandler:
             self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
 
             globals.isEmbeddingsModelUpdated = True
+
+            thread_faiss = threading.Thread(target=update_file_on_github, args=("umd_vector_store/index.faiss",))
+            thread_pkl = threading.Thread(target=update_file_on_github, args=("umd_vector_store/index.pkl",))
+
+            thread_faiss.start()
+            thread_pkl.start()
 
             return self.vector_store  # Returns the newly created vector store
 
