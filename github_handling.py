@@ -34,8 +34,8 @@ def update_file_on_github(filepath):
 
                 contents = repo.get_contents(filepath)
 
-                repo.update_file(filepath, r"Updated {filepath}", file_content, contents.sha,
-                                 branch='main')
+                repo.update_file(path=filepath, message=str(repr(f"Updated {filepath}")), content=file_content,
+                                 sha=contents.sha, branch='main')
 
                 g.close()
             except:
