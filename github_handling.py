@@ -6,8 +6,9 @@ import streamlit as st
 from globals import github_lock
 
 # using an access token
-GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
-auth = Auth.Token(GITHUB_TOKEN)
+# GITHUB_TOKEN = st.secrets["GITHUB_TOKEN"]
+# auth = Auth.Token(GITHUB_TOKEN)
+auth = Auth.Token(" ")
 
 
 def update_file_on_github(filepath):
