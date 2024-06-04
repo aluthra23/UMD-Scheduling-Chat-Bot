@@ -34,7 +34,7 @@ def update_file_on_github(filepath):
 
                 contents = repo.get_contents(filepath)
 
-                repo.update_file(filepath, f"Updated {filepath}", file_content, contents.sha,
+                repo.update_file(filepath, r"Updated {filepath}", file_content, contents.sha,
                                  branch='main')
 
                 g.close()
