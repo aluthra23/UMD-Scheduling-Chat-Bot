@@ -1,4 +1,4 @@
-# UMD Class Schedule Chatbot
+# UMD Scheduling Chatbot
 
 ## Overview
 
