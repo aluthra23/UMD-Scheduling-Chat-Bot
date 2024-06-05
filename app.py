@@ -60,7 +60,10 @@ def check_update_needed():
             last_updated = datetime.fromisoformat(file.read().strip())
 
         time_difference = datetime.now() - last_updated
-        time_to_sleep = max(0.0, (timedelta(hours=1) - time_difference).total_seconds())
+        try:
+            time_to_sleep = max(0.0, (timedelta(hours=1) - time_difference).total_seconds())
+        except:
+            time_to_sleep = 0.0
 
         time.sleep(time_to_sleep)  # Sleep for the remaining time until the next hour
 
