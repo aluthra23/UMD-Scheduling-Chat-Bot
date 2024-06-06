@@ -1,7 +1,7 @@
 
 # List of course acronyms
 course_acronyms = [
-    "AAPS", "AASP", "AAST", "ABRM", "AGNR", "AGST",
+    "AAAS", "AAPS", "AASP", "AAST", "ABRM", "AGNR", "AGST",
     "AMSC", "AMST", "ANSC", "ANTH", "AOSC", "ARAB", "ARCH",
     "AREC", "ARHX", "ARHU", "ARMY", "ARSC", "ARTH", "ARTT", "ARTX", "ARUX", "ASTR", "BCHM",
     "BIOE", "BIOI", "BIOL", "BIOM", "BIPH", "BISI", "BMGT",
@@ -12,7 +12,7 @@ course_acronyms = [
     "CPSA", "CPSD", "CPSF", "CPSG", "CPSN", "CPSP", "CPSS", "DANC", "DATA",
     "EALL", "ECON", "EDCI", "EDCP", "EDHD", "EDHI", "EDMS", "EDPS", "EDSP",
     "EDUC", "EMBA", "ENAE", "ENBC", "ENCE", "ENCO", "ENEB", "ENEE",
-    "ENES", "ENFP", "ENGL", "ENGX", "ENMA", "ENME", "ENNU", "ENPM", "ENRE", "ENSE",
+    "ENES", "ENFP", "ENGL", "ENGX", "ENMA", "ENME", "ENMT", "ENNU", "ENPM", "ENRE", "ENSE",
     "ENSP", "ENST", "ENTM", "ENTS", "EPIB", "FIRE", "FGSM", "FMSC",
     "FREN", "GBHL", "GEMS", "GEOG", "GEOL", "GERM", "GERS", "GREK", "GVPT",
     "HACS", "HBUS", "HDCC", "HEBR", "HEIP", "HESI", "HESP", "HGLO", "HHUM",
@@ -21,9 +21,9 @@ course_acronyms = [
     "JAPN", "JOUR", "JWST", "KNES", "KORA", "LACS", "LARC", "LASX", "LATN",
     "LBSC", "LEAD", "LGBT", "LGBX", "LING", "MATH", "MEES",
     "MIEH", "MITH", "MLAW", "MLSC", "MOCB", "MSML", "MSQC", "MUED",
-    "MUET","MUSC", "MUSP", "NACS", "NAVY", "NEUR", "NFSC", "NIAS", "PEER", "PERS",
+    "MUET", "MUSC", "MUSP", "NACS", "NAVY", "NEUR", "NFSC", "NIAS", "PEER", "PERS",
     "PHIL", "PHIX", "PHPE", "PHPX", "PHSC", "PHYS", "PLCY", "PLSC", "PORT", "PSYC", "RDEV",
-    "RELS", "RUSS", "SLAA", "SLLC", "SLLX", "SMLP", "SOCY", "SPAN", "SPAX", "SPHL",
+    "RELS", "RELX", "RUSS", "SLAA", "SLLC", "SLLX", "SMLP", "SOCY", "SPAN", "SPAX", "SPHL",
     "STAT", "SURV", "TDPS", "THET", "THEX", "TLPL", "TLTC", "UMEI",
     "UNIV", "URSP", "USLT", "VMSC", "WMSX", "WEID", "WGSS", "XPER"
 ]
