@@ -17,5 +17,3 @@ with open('umd_catalog_courses.csv', mode='w', newline='') as file:
     # Iterate over each course acronym
     for course_acronym in df["COURSE PREFIX"]:
         scraper.scrape_course_data(course_acronym, file)
-
-print("Course data has been written to umd_catalog_courses.csv")

@@ -11,7 +11,6 @@ with open('gen_eds.csv', mode='w', newline='') as file:
 
     response = requests.get(url)
     if response.status_code != 200:
-        print("Site is down. Please try again later.") # Site is down
         exit()
 
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -30,5 +29,3 @@ with open('gen_eds.csv', mode='w', newline='') as file:
         acronym = f"{words[1][:-1].strip()}"
 
         writer.writerow([acronym, full_form])
-
-    print("Data collection complete. Data has been saved to gen_eds.csv")
