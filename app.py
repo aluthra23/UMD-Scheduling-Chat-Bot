@@ -59,7 +59,6 @@ def check_update_needed():
         with open("./timer.txt", "r") as file:
             last_updated = datetime.fromisoformat(file.read().strip())
 
-
         time_difference = datetime.now() - last_updated
         try:
             if (timedelta(hours=1) - time_difference).days < 0:
