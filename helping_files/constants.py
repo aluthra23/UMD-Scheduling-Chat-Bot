@@ -1,33 +1,5 @@
 
-# List of course acronyms
-course_acronyms = [
-    "AAAS", "AAPS", "AASP", "AAST", "ABRM", "AGNR", "AGST",
-    "AMSC", "AMST", "ANSC", "ANTH", "AOSC", "ARAB", "ARCH",
-    "AREC", "ARHX", "ARHU", "ARMY", "ARSC", "ARTH", "ARTT", "ARTX", "ARUX", "ASTR", "BCHM",
-    "BIOE", "BIOI", "BIOL", "BIOM", "BIPH", "BISI", "BMGT",
-    "BMSO", "BSCI", "BSCV", "BSGC", "BSOS", "BSST", "BUAC", "BUDT", "BUFN", "BULM", "BUMK",
-    "BUSI", "BUSM", "BUSO", "CBMG", "CCJS", "CHBE", "CHEM", "CHIN", "CHPH",
-    "CHSE", "CINE", "CINX", "CLAS", "CLAX", "CLFS", "CMLT", "CMLX", "CMSC", "CMNS", "COMM",
-    "COMX", "CPBE", "CPCV", "CPDJ", "CPET", "CPGH", "CPJT", "CPMS", "CPPL",
-    "CPSA", "CPSD", "CPSF", "CPSG", "CPSN", "CPSP", "CPSS", "DANC", "DATA",
-    "EALL", "ECON", "EDCI", "EDCP", "EDHD", "EDHI", "EDMS", "EDPS", "EDSP",
-    "EDUC", "EMBA", "ENAE", "ENBC", "ENCE", "ENCO", "ENEB", "ENEE",
-    "ENES", "ENFP", "ENGL", "ENGX", "ENMA", "ENME", "ENMT", "ENNU", "ENPM", "ENRE", "ENSE",
-    "ENSP", "ENST", "ENTM", "ENTS", "EPIB", "FIRE", "FGSM", "FMSC",
-    "FREN", "GBHL", "GEMS", "GEOG", "GEOL", "GERM", "GERS", "GREK", "GVPT",
-    "HACS", "HBUS", "HDCC", "HEBR", "HEIP", "HESI", "HESP", "HGLO", "HHUM",
-    "HISP", "HIST", "HISX", "HLSA", "HLSC", "HLTH", "HNUH", "HONR", "IDEA",
-    "IMDM", "IMMR", "INAG", "INFM", "INST", "ISRL", "ITAL", "ITAX", "IVSP",
-    "JAPN", "JOUR", "JWST", "KNES", "KORA", "LACS", "LARC", "LASX", "LATN",
-    "LBSC", "LEAD", "LGBT", "LGBX", "LING", "MATH", "MEES",
-    "MIEH", "MITH", "MLAW", "MLSC", "MOCB", "MSML", "MSQC", "MUED",
-    "MUET", "MUSC", "MUSP", "NACS", "NAVY", "NEUR", "NFSC", "NIAS", "PEER", "PERS",
-    "PHIL", "PHIX", "PHPE", "PHPX", "PHSC", "PHYS", "PLCY", "PLSC", "PORT", "PSYC", "RDEV",
-    "RELS", "RELX", "RUSS", "SLAA", "SLLC", "SLLX", "SMLP", "SOCY", "SPAN", "SPAX", "SPHL",
-    "STAT", "SURV", "TDPS", "THET", "THEX", "TLPL", "TLTC", "UMEI",
-    "UNIV", "URSP", "USLT", "VMSC", "WMSX", "WEID", "WGSS", "XPER"
-]
-
+# Constants for the CSV files
 CSV_CATALOG_COURSES_HEADER = [
     "COURSE PREFIX",
     "COURSE NUMBER",
@@ -92,11 +64,6 @@ CSV_SOC_HEADER = [
     "DESCRIPTION",
 ]
 
-
-CSV_BUILDINGS_HEADER = [
-    "BUILDING CODE",
-    "FULL FORM",
-]
 
 CSV_GEN_EDS_HEADER = [
     "GENERAL EDUCATION ACRONYM",
