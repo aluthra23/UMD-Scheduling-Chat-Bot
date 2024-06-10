@@ -10,8 +10,7 @@ def scrape_course_data(course_acronym, file):
 
     response = requests.get(url)
     if response.status_code != 200:
-        print(f"Failed to fetch data for {course_acronym}")
-        return []
+        return
 
     # Parse the HTML content
     soup = BeautifulSoup(response.text, 'html.parser')
