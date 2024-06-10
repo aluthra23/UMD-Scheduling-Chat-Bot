@@ -56,12 +56,16 @@ if user_input := st.chat_input():
 # Function to check if an hour has passed since the last update
 def check_update_needed():
     while True:
-        with open("timer.txt", "r") as file:
+        with open("./timer.txt", "r") as file:
             last_updated = datetime.fromisoformat(file.read().strip())
+
 
         time_difference = datetime.now() - last_updated
         try:
-            time_to_sleep = max(0.0, (timedelta(hours=1) - time_difference).total_seconds())
+            if (timedelta(hours=1) - time_difference).days < 0:
+                time_to_sleep = 0.0
+            else:
+                time_to_sleep = max(0.0, (timedelta(hours=1) - time_difference).total_seconds())
         except:
             time_to_sleep = 0.0
 
@@ -77,7 +81,8 @@ def check_update_needed():
         with globals.universal_lock:
             globals.isEmbeddingsModelUpdated = False
             main_soc_scraper.update_current_semester_coursework_data(
-                file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv"
+                file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv",
+                course_prefixes_path=f"{os.getcwd()}/course_prefixes_dataset_creation/umd_course_prefixes.csv"
             )
 
             # update_file_on_github("timer.txt")
