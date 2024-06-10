@@ -77,7 +77,7 @@ def check_update_needed():
         with globals.universal_lock:
             globals.isEmbeddingsModelUpdated = False
             main_soc_scraper.update_current_semester_coursework_data(
-                file_path="./schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv"
+                file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv"
             )
 
             # update_file_on_github("timer.txt")
