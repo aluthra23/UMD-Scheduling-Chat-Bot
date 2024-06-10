@@ -24,8 +24,6 @@ ARTX,Art Studio Education Abroad
 ARUX,Arts and Humanities Education Abroad
 ASTR,Astronomy
 BCHM,Biochemistry
-BEES,"Behavior, Ecology, Evolution and Systematics"
-BERC,"Center for Study of Business, Ethics, Regulation, Crime"
 BIOE,Bioengineering
 BIOI,Bioinformatics and Computational Biology
 BIOL,Biology
@@ -44,7 +42,6 @@ BUDT,Decision and Information Technologies
 BUFN,Finance
 BULM,"Logistics, Business, and Public Policy"
 BUMK,Marketing
-BUMO,Management and Organization
 BUSI,Part-Time MBA Program
 BUSM,Full-Time MBA Program
 BUSO,Online MBA Program
@@ -66,7 +63,6 @@ CMNS,"Computer, Math, and Natural Sciences"
 CMSC,Computer Science
 COMM,Communication
 COMX,Communication Education Abroad
-CONS,Sustainable Development & Conservation Biology
 CPBE,"College Park Scholars-Business, Society, and Economy"
 CPCV,College Park Scholars-Civic Engagement for Social Good
 CPDJ,College Park Scholars-Data Justice
@@ -98,7 +94,6 @@ EMBA,Executive MBA Program
 ENAE,"Engineering, Aerospace"
 ENBC,Biocomputational Engineering
 ENCE,"Engineering, Civil"
-ENCH,"Engineering, Chemical"
 ENCO,"Engineering, Cooperative Education"
 ENEB,Cyber-Physical Systems Engineering
 ENEE,Electrical & Computer Engineering
@@ -111,7 +106,6 @@ ENME,"Engineering, Mechanical"
 ENMT,Mechatronics Engineering
 ENNU,"Engineering, Nuclear"
 ENPM,"Engineering, Professional Masters"
-ENPP,Engineering and Public Policy
 ENRE,Reliability Engineering
 ENSE,Systems Engineering
 ENSP,Environmental Science and Policy
@@ -120,10 +114,8 @@ ENTM,Entomology
 ENTS,Telecommunications
 EPIB,Epidemiology and Biostatistics
 FGSM,Federal and Global Fellows
-FILM,Film Studies
 FIRE,First-Year Innovation & Research Experience
 FMSC,Family Science
-FOLA,Foreign Language
 FREN,French
 GBHL,Global Health
 GEMS,Gemstone
@@ -145,8 +137,6 @@ HHUM,Honors Humanities
 HISP,Historic Preservation
 HIST,History
 HISX,History Education Abroad
-HLHP,Health and Human Performance
-HLMN,Hillman Entrepreneurs Program
 HLSA,Health Services Administration
 HLSC,Integrated Life Sciences
 HLTH,Health
@@ -169,7 +159,6 @@ KNES,Kinesiology
 KORA,Korean
 LACS,Latin American and Caribbean Studies
 LARC,Landscape Architecture
-LASC,Certificate in Latin American Studies
 LASX,Certificate in Latin American Studies Education Abroad
 LATN,Latin
 LBSC,Library Science
@@ -177,7 +166,6 @@ LEAD,Leadership Education and Development
 LGBT,Lesbian Gay Bisexual Transgender Studies
 LGBX,Lesbian Gay Bisexual Transgender Studies Education Abroad
 LING,Linguistics
-MAIT,Masters in the Mathematics of Advanced Industrial Tech
 MATH,Mathematics
 MEES,Marine-Estuarine-Environmental Sciences
 MIEH,Maryland Institute for Applied Environmental Health
@@ -208,7 +196,6 @@ PLCY,Public Policy
 PLSC,Plant Sciences
 PORT,Portuguese
 PSYC,Psychology
-PUAF,Public Policy
 RDEV,Real Estate Development
 RELS,Religious Studies
 RELX,Religious Studies Education Abroad
@@ -228,7 +215,6 @@ THET,Theatre
 THEX,Theatre Education Abroad
 TLPL,"Teaching and Learning, Policy and Leadership"
 TLTC,Teaching and Learning Transformation Center
-TOXI,Toxicology
 UMEI,Maryland English Institute
 UNIV,University Courses
 URSP,Urban Studies and Planning
@@ -236,6 +222,5 @@ USLT,Latina/o Studies
 VMSC,Veterinary Medical Sciences
 WEID,Words of Engagement Intergroup Dialogue Program
 WGSS,"Women, Gender, and Sexuality Studies"
-WMST,Women's Studies
 WMSX,Women's Studies Education Abroad
 XPER,xFoundry

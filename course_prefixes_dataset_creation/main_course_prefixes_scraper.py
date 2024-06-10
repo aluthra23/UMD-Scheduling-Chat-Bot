@@ -7,7 +7,6 @@ import pandas as pd
 def update_umd_courses(file_path='umd_course_prefixes.csv'):
     soc_scraper(file_path)
     course_catalog_scraper("https://academiccatalog.umd.edu/undergraduate/approved-courses/", file_path=file_path)
-    course_catalog_scraper("https://academiccatalog.umd.edu/graduate/courses/", file_path=file_path)
 
     df = pd.read_csv(file_path)
 
@@ -16,5 +15,3 @@ def update_umd_courses(file_path='umd_course_prefixes.csv'):
 
     # Write the sorted DataFrame back to the CSV file
     df_sorted.to_csv(file_path, index=False)
-
-# update_umd_courses()
