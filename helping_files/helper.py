@@ -21,8 +21,6 @@ def remove_period_end(string):
     else:
         return string
 
-# print(remove_period_end("Hi there."))
-
 
 def parse_extra(example_string):
     # Find the index of the first colon
@@ -138,7 +136,6 @@ def extract_abnormal_course_details(existing_dict, actual_html):
     if all_course_texts:
         link = extract_link_from_html(html_content=str(all_course_texts[-1]))
         if link:
-            # print("THIS HAPPENED")
             description += f" {link}"
 
     existing_dict["DESCRIPTION"] = description.strip()
@@ -150,6 +147,3 @@ def remove_all_whitespace(input_string):
             .replace("or", " or ").replace("iftakenwith", "if taken with ")
             .replace("GenEd:", ""))
 
-# input_string = "GenEd:\n\n\n\n\nDSHS, \n\n\n\n\nDVUP"
-# result = remove_whitespace(input_string)
-# print("Result:", result)

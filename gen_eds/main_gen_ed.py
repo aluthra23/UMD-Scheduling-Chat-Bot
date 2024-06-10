@@ -11,7 +11,7 @@ with open('gen_eds.csv', mode='w', newline='') as file:
 
     response = requests.get(url)
     if response.status_code != 200:
-        print(f"Failed to fetch data")
+        print("Site is down. Please try again later.") # Site is down
         exit()
 
     soup = BeautifulSoup(response.text, 'html.parser')

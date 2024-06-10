@@ -17,7 +17,6 @@ def scrape_course_data(course_acronym, file):
     # Fetch the web page
     response = requests.get(url)
     if response.status_code != 200:
-        print(f"Failed to fetch data for {course_acronym}")
         return
 
     # Parse the HTML content
