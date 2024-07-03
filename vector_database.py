@@ -1,9 +1,6 @@
 from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.schema import Document
-
-import github_handling
-from github_handling import update_file_on_github
 import globals
 from data_preprocessing import load_datasets
 from datetime import datetime, timedelta
