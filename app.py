@@ -28,7 +28,7 @@ if user_input := st.chat_input():
         spinner_text = "Getting response..."
 
         if not globals.isEmbeddingsModelUpdated:
-            spinner_text = "Updating our datasets (1-2 minutes) and Getting response..."
+            spinner_text = "Updating our datasets (3-4 minutes) and Getting response..."
 
         with st.spinner(spinner_text):
             st.session_state.messages.append({"role": "user", "content": user_input})
