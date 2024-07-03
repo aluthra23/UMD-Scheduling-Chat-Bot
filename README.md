@@ -19,7 +19,6 @@ The UMD Scheduling Chatbot is an AI-powered assistant designed to help students 
 - **OpenAI API**: The OpenAI API, particularly the GPT-40 model, is the backbone of the chatbot's natural language understanding and generation capabilities. It processes user queries and generates relevant, context-aware responses. Using this API incurs costs based on usage, which can be found on [OpenAI's pricing page](https://openai.com/pricing). The GPT-40 model is integrated using the OpenAI API to understand and generate human-like responses.
 - **LangChain**: LangChain is a framework designed to streamline the development of language model applications. It enhances the chatbot's natural language processing capabilities, enabling it to understand complex queries and provide accurate responses. LangChain facilitates the creation of text embeddings, which are vector representations of text data. These embeddings are crucial for understanding the semantic meaning of user queries and the course information stored in the vector database. LangChain also helps create a vector database by converting course data into Document objects, which are then embedded into vectors. These vectors are stored in the FAISS index, enabling efficient similarity searches.
 - **FAISS (Facebook AI Similarity Search)**: FAISS is a library developed by Facebook AI Research for efficient similarity search and clustering of dense vectors. In the UMD Scheduling Chatbot, FAISS is used to build and manage the vector store for efficient information retrieval. It enables fast similarity searches, ensuring the chatbot can quickly find relevant course information. The vector store is periodically updated with the latest course information, allowing the chatbot to perform fast and accurate searches.
-- **Threading**: Threading is used to handle background updates to ensure that the vector store is always up-to-date with the latest course information. A separate thread is created to periodically check if an update is needed and perform the update without blocking the main application. This approach allows the chatbot to remain responsive while maintaining up-to-date data.
 
 ## Integration of Technologies
 
@@ -37,7 +36,7 @@ The integration of Streamlit, LangChain, FAISS, and the OpenAI API is crucial to
 
 6. **User Interface**: The Streamlit framework is used to create the user interface of the chatbot. Users interact with the chatbot through a simple and intuitive chat interface provided by Streamlit. Streamlit handles real-time interactions and updates, making the chatbot responsive and user-friendly.
 
-7. **Background Updates**: To ensure the data is always up-to-date, threading is used to periodically update the vector store with the latest course information. This is managed by a separate thread that checks if an update is needed and performs the update without blocking the main application.
+7. **Background Updates**: To ensure the data is always up-to-date, we periodically update the vector store with the latest course information. 
 
 ## Project Structure
 
