@@ -41,18 +41,32 @@ class VectorStoreHandler:
         :return: a vector store with the UMD coursework data
         """
 
-        globals.universal_lock.acquire()
+        with open("./timer.txt", "r") as file:
+            last_updated = datetime.fromisoformat(file.read().strip())
 
-        if globals.isEmbeddingsModelUpdated:
-            globals.universal_lock.release()
+        time_difference = datetime.now() - last_updated
+
+        if (timedelta(hours=1) - time_difference).days < 0 or ((timedelta(hours=1) - time_difference).total_seconds()) < 0:
+            globals.isEmbeddingsModelUpdated = False
+
+            with open("timer.txt", "w") as file:
+                current_time = datetime.now()
+                updated_time = current_time.replace(minute=0, second=0, microsecond=0)
+
+                file.write(updated_time.isoformat())
+
+            self.vector_store = self.create_vector_store()
+
+            globals.isEmbeddingsModelUpdated = True
+
+        else:
+            globals.isEmbeddingsModelUpdated = True
+
             # Loads the currently stored version of the vector store if no update needed
             self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
                                                  embeddings=self.embeddings,
                                                  allow_dangerous_deserialization=True)
-        else:
-            # Creates a new vector store if an updated is needed
-            self.vector_store = self.create_vector_store()
-            globals.universal_lock.release()
+
 
     def create_vector_store(self):
         """
@@ -78,21 +92,6 @@ class VectorStoreHandler:
         self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
 
         globals.isEmbeddingsModelUpdated = True
-
-        # thread_faiss = threading.Thread(target=update_file_on_github,
-        #                                 args=("umd_vector_store/index.faiss",),
-        #                                 daemon=True)
-        # thread_pkl = threading.Thread(target=update_file_on_github,
-        #                               args=("umd_vector_store/index.pkl",),
-        #                               daemon=True)
-        #
-        # # Add Streamlit context to threads
-        # ctx = get_script_run_ctx()
-        # add_script_run_ctx(thread=thread_faiss, ctx=ctx)
-        # add_script_run_ctx(thread=thread_pkl, ctx=ctx)
-        #
-        # thread_faiss.start()
-        # thread_pkl.start()
 
         return self.vector_store  # Returns the newly created vector store
 
