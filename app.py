@@ -1,12 +1,7 @@
 import openai
 import streamlit as st
 import chatbot
-from datetime import datetime, timedelta
-import os
 import globals
-from schedule_of_classes_scraper import main_soc_scraper
-import time
-from github_handling import update_file_on_github
 
 
 # Streamlit UI
