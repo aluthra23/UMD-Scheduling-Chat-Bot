@@ -29,9 +29,9 @@ class VectorStoreHandler:
 
         :param api_key: stores api_keys to all of our models and initializes an OpenAIEmbeddings model
         """
-        self.api_key = api_key # Stores API key
-        self.vector_store = None # Holds the FAISS vector store
-        self.embeddings = OpenAIEmbeddings(api_key=api_key) # An embeddings model for generating text embeddings.
+        self.api_key = api_key  # Stores API key
+        self.vector_store = None  # Holds the FAISS vector store
+        self.embeddings = OpenAIEmbeddings(api_key=api_key)  # An embeddings model for generating text embeddings.
         self.vector_store_path = "umd_vector_store"  # Filepath where FAISS vector store is saved
 
     def load_vector_store(self):
@@ -46,8 +46,14 @@ class VectorStoreHandler:
 
         time_difference = datetime.now() - last_updated
 
-        if (timedelta(hours=1) - time_difference).days < 0 or ((timedelta(hours=1) - time_difference).total_seconds()) < 0:
+        if (timedelta(hours=1) - time_difference).days < 0 or (
+        (timedelta(hours=1) - time_difference).total_seconds()) < 0:
             globals.isEmbeddingsModelUpdated = False
+
+            main_soc_scraper.update_current_semester_coursework_data(
+                file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv",
+                course_prefixes_path=f"{os.getcwd()}/course_prefixes_dataset_creation/umd_course_prefixes.csv"
+            )
 
             with open("timer.txt", "w") as file:
                 current_time = datetime.now()
@@ -66,7 +72,6 @@ class VectorStoreHandler:
             self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
                                                  embeddings=self.embeddings,
                                                  allow_dangerous_deserialization=True)
-
 
     def create_vector_store(self):
         """
@@ -88,8 +93,8 @@ class VectorStoreHandler:
         # Merges all the documents
         all_documents = course_docs + catalog_docs + prefix_docs + gen_eds_docs
 
-        self.vector_store = FAISS.from_documents(all_documents, self.embeddings) # Builds vector store
-        self.vector_store.save_local(self.vector_store_path) # Saves vector store to "./umd_vector_store"
+        self.vector_store = FAISS.from_documents(all_documents, self.embeddings)  # Builds vector store
+        self.vector_store.save_local(self.vector_store_path)  # Saves vector store to "./umd_vector_store"
 
         globals.isEmbeddingsModelUpdated = True
 
@@ -107,8 +112,7 @@ class VectorStoreHandler:
         if self.vector_store is None:
             # Loads a vector store if it doesn't exist
             self.load_vector_store()
-        return self.vector_store.similarity_search(query, k=k) # Finds top 'k' documents related to query
-
+        return self.vector_store.similarity_search(query, k=k)  # Finds top 'k' documents related to query
 
     def create_documents(self, df, source_name):
         """
