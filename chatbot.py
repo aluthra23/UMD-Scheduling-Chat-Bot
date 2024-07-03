@@ -49,5 +49,5 @@ def chatbot_response(query, api_key, k=50):
 
         # Extracts the content of the first message in the response choices
         return response.choices[0].message.content.strip()
-    except Exception as e:
-        return f"An error occurred: {str(e)}"
+    except:
+        return f"An error occurred. Please try again."

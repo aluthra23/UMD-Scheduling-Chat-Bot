@@ -42,50 +42,8 @@ if user_input := st.chat_input():
                 response = chatbot.chatbot_response(user_input, openai_api_key)
             except openai.AuthenticationError:
                 response = "Invalid OpenAI API key. Please enter a valid key."
-            except Exception as e:
+            except:
                 response = f"An error occurred. Try again."
 
         st.session_state.messages.append({"role": "assistant", "content": response})
         st.chat_message("assistant").write(response)
-
-
-# Function to check if an hour has passed since the last update
-def check_update_needed():
-    while True:
-        with open("./timer.txt", "r") as file:
-            last_updated = datetime.fromisoformat(file.read().strip())
-
-        time_difference = datetime.now() - last_updated
-        try:
-            if (timedelta(hours=1) - time_difference).days < 0:
-                time_to_sleep = 0.0
-            else:
-                time_to_sleep = max(0.0, (timedelta(hours=1) - time_difference).total_seconds())
-        except:
-            time_to_sleep = 0.0
-
-        time.sleep(time_to_sleep)  # Sleep for the remaining time until the next hour
-
-        # Writes the current time to the timer.txt file
-        with open("timer.txt", "w") as file:
-            current_time = datetime.now()
-            updated_time = current_time.replace(minute=0, second=0, microsecond=0)
-
-            file.write(updated_time.isoformat())
-
-        with globals.universal_lock:
-            globals.isEmbeddingsModelUpdated = False
-            main_soc_scraper.update_current_semester_coursework_data(
-                file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv",
-                course_prefixes_path=f"{os.getcwd()}/course_prefixes_dataset_creation/umd_course_prefixes.csv"
-            )
-
-            update_file_on_github("timer.txt")
-            update_file_on_github("schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv")
-
-
-# Start a separate thread to check for updates in the background
-# update_thread = threading.Thread(target=check_update_needed, daemon=True)
-# ctx = get_script_run_ctx()
-# add_script_run_ctx(thread=update_thread, ctx=ctx)
-# update_thread.start()
