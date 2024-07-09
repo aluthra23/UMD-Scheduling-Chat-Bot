@@ -2,11 +2,12 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import csv
+from term_id_functions import update_term_id
 
 from helping_files import helper
 
-# Term ID for the Fall 2024 term
-term_id = "202408"
+# Term ID for the most recent term
+term_id = update_term_id()
 
 # Base URL for the UMD schedule of classes search
 base_url = "https://app.testudo.umd.edu/soc/search"

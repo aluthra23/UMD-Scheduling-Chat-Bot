@@ -2,12 +2,13 @@ from helping_files import constants
 import csv
 import requests
 from bs4 import BeautifulSoup
+from term_id_functions import update_term_id
 
 with open('gen_eds.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
     # Write the header row
     writer.writerow(constants.CSV_GEN_EDS_HEADER)
-    url = "https://app.testudo.umd.edu/soc/gen-ed/202408/"
+    url = f"https://app.testudo.umd.edu/soc/gen-ed/{update_term_id()}/"
 
     response = requests.get(url)
     if response.status_code != 200:
