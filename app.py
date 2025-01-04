@@ -50,8 +50,8 @@ if user_input := st.chat_input():
                 st.session_state["conversation_history"].append(f"Bot: {response}")
 
 
-                if len(st.session_state["conversation_history"]) > 6:
-                    st.session_state["conversation_history"] = st.session_state["conversation_history"][-6:]
+                if len(st.session_state["conversation_history"]) > 2:
+                    st.session_state["conversation_history"] = st.session_state["conversation_history"][-2:]
             except openai.AuthenticationError:
                 response = "Invalid OpenAI API key. Please enter a valid key."
             except Exception as e:
