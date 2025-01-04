@@ -34,37 +34,45 @@ class VectorStoreHandler:
         :return: a vector store with the UMD coursework data
         """
 
-        with open("./timer.txt", "r") as file:
-            last_updated = datetime.fromisoformat(file.read().strip())
+        # with open("./timer.txt", "r") as file:
+        #     last_updated = datetime.fromisoformat(file.read().strip())
+        #
+        # time_difference = datetime.now() - last_updated
+        #
+        # if (timedelta(hours=1) - time_difference).days < 0 or (
+        # (timedelta(hours=1) - time_difference).total_seconds()) < 0:
+        #     globals.isEmbeddingsModelUpdated = False
+        #
+        #     main_soc_scraper.update_current_semester_coursework_data(
+        #         file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv",
+        #         course_prefixes_path=f"{os.getcwd()}/course_prefixes_dataset_creation/umd_course_prefixes.csv"
+        #     )
+        #
+        #     with open("timer.txt", "w") as file:
+        #         current_time = datetime.now()
+        #         updated_time = current_time.replace(minute=0, second=0, microsecond=0)
+        #
+        #         file.write(updated_time.isoformat())
+        #
+        #     self.vector_store = self.create_vector_store()
+        #
+        #     globals.isEmbeddingsModelUpdated = True
+        #
+        # else:
+        #     globals.isEmbeddingsModelUpdated = True
+        #
+        #     # Loads the currently stored version of the vector store if no update needed
+        #     self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
+        #                                          embeddings=self.embeddings,
+        #                                          allow_dangerous_deserialization=True)
 
-        time_difference = datetime.now() - last_updated
+        globals.isEmbeddingsModelUpdated = True
 
-        if (timedelta(hours=1) - time_difference).days < 0 or (
-        (timedelta(hours=1) - time_difference).total_seconds()) < 0:
-            globals.isEmbeddingsModelUpdated = False
+        # Loads the currently stored version of the vector store if no update needed
+        self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
+                                             embeddings=self.embeddings,
+                                             allow_dangerous_deserialization=True)
 
-            main_soc_scraper.update_current_semester_coursework_data(
-                file_path=f"{os.getcwd()}/schedule_of_classes_scraper/umd_schedule_of_classes_courses.csv",
-                course_prefixes_path=f"{os.getcwd()}/course_prefixes_dataset_creation/umd_course_prefixes.csv"
-            )
-
-            with open("timer.txt", "w") as file:
-                current_time = datetime.now()
-                updated_time = current_time.replace(minute=0, second=0, microsecond=0)
-
-                file.write(updated_time.isoformat())
-
-            self.vector_store = self.create_vector_store()
-
-            globals.isEmbeddingsModelUpdated = True
-
-        else:
-            globals.isEmbeddingsModelUpdated = True
-
-            # Loads the currently stored version of the vector store if no update needed
-            self.vector_store = FAISS.load_local(folder_path=self.vector_store_path,
-                                                 embeddings=self.embeddings,
-                                                 allow_dangerous_deserialization=True)
 
     def create_vector_store(self):
         """
