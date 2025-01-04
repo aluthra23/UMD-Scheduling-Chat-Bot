@@ -38,8 +38,8 @@ if user_input := st.chat_input():
                 results = qdrant_manager.search_similar(
                     collection_name="course",
                     prompt=user_input,
-                    limit=100,
-                    similarity_threshold=0.2
+                    limit=50,
+                    similarity_threshold=0.4
                 )
                 response = chatbot.chatbot_response(user_input, openai_api_key, results)
             except openai.AuthenticationError:
