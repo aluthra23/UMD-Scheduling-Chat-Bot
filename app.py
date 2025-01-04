@@ -39,7 +39,7 @@ if user_input := st.chat_input():
                     collection_name="course",
                     prompt=user_input,
                     limit=100,
-                    similarity_threshold=0.5
+                    similarity_threshold=0.2
                 )
                 response = chatbot.chatbot_response(user_input, openai_api_key, results)
             except openai.AuthenticationError:
