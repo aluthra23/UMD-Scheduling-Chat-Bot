@@ -1,14 +1,14 @@
-import os
 import pandas as pd
 from dotenv import load_dotenv
 
 from qdrant_manager import QdrantManager
+import streamlit as st
 
 load_dotenv()
 
 
-collection_name = "hithere"
-qdrant_manager = QdrantManager(api_key=os.getenv('API_KEY'), host=os.getenv('QDRANT_LINK'))
+collection_name = "gemini_courses"
+qdrant_manager = QdrantManager(qdrant_api_key=st.secrets['QDRANT_API_KEY'], google_api_key= st.secrets['GOOGLE_API_KEY'], host=st.secrets['QDRANT_LINK'])
 
 qdrant_manager.create_collection(collection_name=collection_name)
 
