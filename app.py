@@ -12,9 +12,7 @@ collection_name="gemini_courses"
 
 
 st.title("UMD Scheduling Chatbot")
-st.write("Ask me anything about UMD coursework and the courses that are being offered in the upcoming semester! "
-         "Because the Schedule of Classes website is constantly being updated, our datasets need to be constantly "
-         "updated as well, so there might be a slight delay the first time you ask something!")
+st.write("Ask me anything about UMD coursework and the courses that are being offered in the upcoming semester! ")
 
 if "messages" not in st.session_state:
     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
