@@ -2,7 +2,6 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import VectorParams, PointStruct, Distance
 from sentence_transformers import SentenceTransformer
 import os
-import ollama
 
 # Environment setup
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -35,7 +34,7 @@ class QdrantManager:
         try:
             # Delete existing collection if it exists
             self.client.delete_collection(collection_name)
-        except:
+        except Exception as e:
             pass
 
         # Create new collection
@@ -64,13 +63,12 @@ class QdrantManager:
         self.client.delete_collection(collection_name)
         self.collections.pop(collection_name)
 
-    def add_text(self, collection_name: str, text: str, company: str):
+    def add_text(self, collection_name: str, text: str):
         """
         Add text to a specific collection
 
         :param collection_name: Name of the collection
         :param text: Text to be added
-        :param company: company
         """
         # Ensure collection exists
         if collection_name not in self.collections:
@@ -84,7 +82,6 @@ class QdrantManager:
 
         metadata = {
             "text": text,
-            "company": company
         }
 
         self.client.upsert(
@@ -126,10 +123,10 @@ class QdrantManager:
         filtered_results = []
 
         for result in results:
-            # if result.score >= similarity_threshold:
-            #     filtered_results.append(result)
-            #     print(f"Document: {result.payload['text']}")
-            #     print(f"Score: {result.score}")
-            filtered_results.append(result)
+            if result.score >= similarity_threshold:
+                filtered_results.append(result)
+                print(f"Document: {result.payload['text']}")
+                print(f"Score: {result.score}\n\n")
+            # filtered_results.append(result)
 
         return filtered_results
