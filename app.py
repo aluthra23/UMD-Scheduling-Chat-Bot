@@ -1,9 +1,13 @@
 import openai
 import streamlit as st
 import chatbot
-import globals
+import os
+from dotenv import load_dotenv
+from qdrant_manager import QdrantManager
 
+load_dotenv()
 
+qdrant_manager = QdrantManager(api_key=st.secrets['API_KEY'], host=st.secrets['QDRANT_LINK'])
 # Streamlit UI
 with st.sidebar:
     openai_api_key = st.text_input("OpenAI API Key", type="password")
@@ -27,14 +31,17 @@ if user_input := st.chat_input():
     elif user_input:
         spinner_text = "Getting response..."
 
-        if not globals.isEmbeddingsModelUpdated:
-            spinner_text = "Updating our datasets (3-5 minutes) and Getting response..."
-
         with st.spinner(spinner_text):
             st.session_state.messages.append({"role": "user", "content": user_input})
             st.chat_message("user").write(user_input)
             try:
-                response = chatbot.chatbot_response(user_input, openai_api_key)
+                results = qdrant_manager.search_similar(
+                    collection_name="course",
+                    prompt=user_input,
+                    limit=100,
+                    similarity_threshold=0.5
+                )
+                response = chatbot.chatbot_response(user_input, openai_api_key, results)
             except openai.AuthenticationError:
                 response = "Invalid OpenAI API key. Please enter a valid key."
             except:
