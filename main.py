@@ -7,7 +7,7 @@ import streamlit as st
 load_dotenv()
 
 
-collection_name = "gemini_courses"
+collection_name = "courses"
 qdrant_manager = QdrantManager(qdrant_api_key=st.secrets['QDRANT_API_KEY'], google_api_key= st.secrets['GOOGLE_API_KEY'], host=st.secrets['QDRANT_LINK'])
 
 qdrant_manager.create_collection(collection_name=collection_name)
@@ -22,7 +22,12 @@ gen_eds_df = pd.read_csv('./gen_eds/gen_eds.csv')
 for df in courses_df, course_catalog_df, prefixes_df, gen_eds_df:
     for _, row in df.iterrows():
         # Concatenate each property for each element which is appended into the list of documents
-        content = " ".join([f"{col}: {row[col]}" for col in df.columns])
+        content = []
+        for col in df.columns:
+            if row[col] != "":
+                content.append(f"{col}: {row[col]}")
+
+        content = " ".join(content)
         qdrant_manager.add_text(
             collection_name=collection_name,
             text=content
