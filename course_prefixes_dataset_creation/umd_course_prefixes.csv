@@ -1,6 +1,5 @@
 COURSE PREFIX,FULL FORM
 AAAS,African American and Africana Studies
-AAPS,Academic Achievement Programs
 AASP,African American Studies
 AAST,Asian American Studies
 ABRM,Anti-Black Racism
@@ -59,7 +58,6 @@ CLAX,Classics Education Abroad
 CLFS,Chemical and Life Sciences
 CMLT,Comparative Literature
 CMLX,Comparative Literature Education Abroad
-CMNS,"Computer, Math, and Natural Sciences"
 CMSC,Computer Science
 COMM,Communication
 COMX,Communication Education Abroad
@@ -166,13 +164,13 @@ LEAD,Leadership Education and Development
 LGBT,Lesbian Gay Bisexual Transgender Studies
 LGBX,Lesbian Gay Bisexual Transgender Studies Education Abroad
 LING,Linguistics
+MAIT,Masters in the Mathematics of Advanced Industrial Tech
 MATH,Mathematics
 MEES,Marine-Estuarine-Environmental Sciences
 MIEH,Maryland Institute for Applied Environmental Health
 MITH,Maryland Institute for Technology in the Humanities
 MLAW,MPower Undergraduate Law Programs
 MLSC,MD Language Science Ctr
-MOCB,Molecular and Cell Biology
 MSML,Machine Learning
 MSQC,Quantum Computing
 MUED,Music Education
@@ -183,7 +181,9 @@ NACS,Neuroscience & Cognitive Science
 NAVY,Navy
 NEUR,Neuroscience
 NFSC,Nutrition and Food Science
-NIAS,National Institute of Aeronautics - North Carolina
+NIAP,National Institute of Aeronautics - Va Tech
+NIAV,National Institute of Aeronautics - Univ of VA
+OURS,Office of Undergraduate Research
 PEER,Health Center
 PERS,Persian
 PHIL,Philosophy
@@ -219,6 +219,7 @@ UMEI,Maryland English Institute
 UNIV,University Courses
 URSP,Urban Studies and Planning
 USLT,Latina/o Studies
+VIPS,Vertically Integrated Projects
 VMSC,Veterinary Medical Sciences
 WEID,Words of Engagement Intergroup Dialogue Program
 WGSS,"Women, Gender, and Sexuality Studies"
