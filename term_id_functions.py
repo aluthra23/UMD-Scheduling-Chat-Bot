@@ -5,11 +5,13 @@ def update_term_id():
     """
     Updates the term_id for the current semester
     """
-    current_month = datetime.now().month
-    current_year = datetime.now().year
+    now_time = datetime.now()
+    current_day = now_time.day
+    current_month = now_time.month
+    current_year = now_time.year
 
 
-    if current_month <= 2:
+    if current_month <= 2 and current_day <= 20:
         term_id = f"{current_year}01"
     elif current_month <= 9:
         term_id = f"{current_year}08"

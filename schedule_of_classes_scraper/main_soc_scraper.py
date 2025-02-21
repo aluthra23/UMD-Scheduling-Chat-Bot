@@ -18,3 +18,5 @@ def update_current_semester_coursework_data(file_path='umd_schedule_of_classes_c
         # Iterate over each course acronym
         for course_acronym in df["COURSE PREFIX"]:
             soc_scraper.scrape_course_data(course_acronym, file)
+
+update_current_semester_coursework_data()
