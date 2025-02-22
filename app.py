@@ -8,7 +8,7 @@ from qdrant_manager import QdrantManager
 load_dotenv()
 
 qdrant_manager = QdrantManager(qdrant_api_key=st.secrets['QDRANT_API_KEY'], google_api_key= st.secrets['GOOGLE_API_KEY'], host=st.secrets['QDRANT_LINK'])
-collection_name="Fall-2025-Courses"
+collection_name="courses"
 
 
 st.title("UMD Scheduling Chatbot")
