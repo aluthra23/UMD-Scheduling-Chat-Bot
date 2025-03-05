@@ -6,6 +6,7 @@ import streamlit as st
 
 load_dotenv()
 
+raise Exception
 
 collection_name = "Fall-2025-Courses"
 qdrant_manager = QdrantManager(qdrant_api_key=st.secrets['QDRANT_API_KEY'], google_api_key= st.secrets['GOOGLE_API_KEY'], host=st.secrets['QDRANT_LINK'])
