@@ -54,6 +54,7 @@ if user_input := st.chat_input():
                 response = "Invalid OpenAI API key. Please enter a valid key."
             except Exception as e:
                 print(e)
+                print("THIS hAPPENED")
                 response = f"An error occurred. Try again."
 
         st.session_state.messages.append({"role": "assistant", "content": response})

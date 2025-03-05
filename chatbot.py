@@ -24,7 +24,7 @@ def chatbot_response(query: str, api_key: str, results, conversation_history: li
     genai.configure(api_key=api_key)
 
     # Create the model instance
-    model = genai.GenerativeModel('gemini-1.0-pro')
+    model = genai.GenerativeModel('gemini-2.0-flash')
 
     history_context = "\n".join(conversation_history[-6:]) if conversation_history else ""
 
@@ -49,4 +49,5 @@ def chatbot_response(query: str, api_key: str, results, conversation_history: li
 
         return response.text.strip()
     except Exception as e:
+        print(e)
         return f"An error occurred. Please try again."
