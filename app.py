@@ -12,7 +12,7 @@ import streamlit as st
 
 
 st.title("UMD Scheduling Chatbot")
-st.write("We have moved to https://umd-chatbot.vercel.app/")
+st.write("We have moved to version 2.0 at https://umd-chatbot.vercel.app/")
 
 # if "messages" not in st.session_state:
 #     st.session_state["messages"] = [{"role": "assistant", "content": "How can I help you?"}]
