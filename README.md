@@ -1,6 +1,6 @@
 # UMD Scheduling Chatbot
 
-## Overview
+## Overviewasdf
 
 The UMD Scheduling Chatbot is an AI-powered assistant designed to help students at the University of Maryland find detailed information about courses and schedules. This project leverages Gemini for response generation and embeddings, and Qdrant Cloud for the vector database to provide accurate and timely responses to user queries about UMD classes. For a live demo, visit <a href="https://umd-chat-bot.streamlit.app/" target="_blank" rel="noopener noreferrer">UMD Chat Bot<a>
 
