@@ -1,6 +1,5 @@
 COURSE PREFIX,FULL FORM
 AAAS,African American and Africana Studies
-AASP,African American Studies
 AAST,Asian American Studies
 ABRM,Anti-Black Racism
 AGNR,Agriculture and Natural Resources
@@ -34,8 +33,6 @@ BMGT,Business and Management
 BMIN,General Business Minor
 BMSO,Online Business MS Programs
 BSCI,Biological Sciences Program
-BSCV,CIVICUS
-BSGC,Global Communities
 BSOS,Behavioral and Social Sciences
 BSST,Terrorism Studies
 BUAC,Accounting and Information Assurance
@@ -64,7 +61,7 @@ CMNS,"Computer, Math, and Natural Sciences"
 CMSC,Computer Science
 COMM,Communication
 COMX,Communication Education Abroad
-CPBE,"College Park Scholars-Business, Society, and Economy"
+CPBE,"College Park Scholars-Business, Society, Entreprenrshp"
 CPCV,College Park Scholars-Civic Engagement for Social Good
 CPDJ,College Park Scholars-Data Justice
 CPET,"College Park Scholars-Environment, Technology & Economy"
@@ -86,6 +83,7 @@ EALL,East Asian Languages and Literatures
 ECON,Economics
 EDCI,Curriculum and Instruction
 EDCP,Education Counseling and Personnel Services
+EDDI,Education Dialogues
 EDHD,"Education, Human Development"
 EDHI,"Education Leadership, Higher Ed and International Ed"
 EDMS,"Measurement, Statistics, and Evaluation"
@@ -94,6 +92,7 @@ EDSP,"Education, Special"
 EDUC,Education
 EMBA,Executive MBA Program
 ENAE,"Engineering, Aerospace"
+ENAI,"Engineering Artificial Intelligence,Professional Masters"
 ENBC,Biocomputational Engineering
 ENCE,"Engineering, Civil"
 ENCO,"Engineering, Cooperative Education"
@@ -107,7 +106,6 @@ ENGX,English Education Abroad
 ENMA,"Engineering, Materials"
 ENME,"Engineering, Mechanical"
 ENMT,Mechatronics Engineering
-ENNU,"Engineering, Nuclear"
 ENPM,"Engineering, Professional Masters"
 ENRE,Reliability Engineering
 ENSE,Systems Engineering
@@ -115,6 +113,7 @@ ENSP,Environmental Science and Policy
 ENST,Environmental Science and Technology
 ENTM,Entomology
 ENTS,Telecommunications
+ENVH,Environmental and Occupational Health
 EPIB,Epidemiology and Biostatistics
 FGSM,Federal and Global Fellows
 FIRE,First-Year Innovation & Research Experience
@@ -124,7 +123,6 @@ GBHL,Global Health
 GEMS,Gemstone
 GEOG,Geographical Sciences
 GEOL,Geology
-GERM,Germanic Studies
 GERS,German Studies
 GREK,Greek
 GVPT,Government and Politics
@@ -175,7 +173,7 @@ MIEH,Maryland Institute for Applied Environmental Health
 MITH,Maryland Institute for Technology in the Humanities
 MLAW,MPower Undergraduate Law Programs
 MLSC,MD Language Science Ctr
-MOCB,Molecular and Cell Biology
+MSAI,Master of Science in Artificial Intelligence
 MSML,Machine Learning
 MSQC,Quantum Computing
 MUED,Music Education
@@ -200,6 +198,7 @@ PLCY,Public Policy
 PLSC,Plant Sciences
 PORT,Portuguese
 PSYC,Psychology
+QMMS,Quantitative Methodology: Measurement and Statistics
 RDEV,Real Estate Development
 RELS,Religious Studies
 RELX,Religious Studies Education Abroad
@@ -223,7 +222,9 @@ UMEI,Maryland English Institute
 UNIV,University Courses
 URSP,Urban Studies and Planning
 USLT,Latina/o Studies
+VIPS,Vertically Integrated Projects
 VMSC,Veterinary Medical Sciences
 WEID,Words of Engagement Intergroup Dialogue Program
 WGSS,"Women, Gender, and Sexuality Studies"
 WMSX,Women's Studies Education Abroad
+XPER,xFoundry
