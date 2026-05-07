@@ -1,8 +1,11 @@
 from qdrant_client import QdrantClient
 from qdrant_client.http.models import VectorParams, PointStruct, Distance
 # from sentence_transformers import SentenceTransformer
-import google.generativeai as genai
+from google import genai
 import os
+from google.genai import types
+import time
+
 
 # Environment setup
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -27,10 +30,9 @@ class QdrantManager:
         # self.model = SentenceTransformer('all-MiniLM-L6-v2')
 
         # Configure Gemini
-        genai.configure(api_key=google_api_key)
-
         # Initialize the embedding model
-        # self.model = genai.GenerativeModel('models/text-embedding-004')
+        self.google_genai = genai.Client(api_key=google_api_key)
+
 
     def create_collection(self, collection_name, vector_size=768):
         """
@@ -90,7 +92,7 @@ class QdrantManager:
         embedding_response = genai.embed_content(
             model="models/text-embedding-004",
             content=text,
-            # task_type=
+            config=types.EmbedContentConfig(output_dimensionality=768)
         )
 
         embedding = embedding_response['embedding']
@@ -128,13 +130,13 @@ class QdrantManager:
         #     raise ValueError(f"Collection '{collection_name}' does not exist")
 
         # Get embedding
-        embedding_response = genai.embed_content(
-            model="models/text-embedding-004",
-            content=prompt
+        embedding_response = self.google_genai.models.embed_content(
+            model="gemini-embedding-001",
+            contents=prompt
         )
 
         # Access the values directly from the embedding response
-        embedding = embedding_response['embedding']
+        embedding = embedding_response.embeddings[0].values
 
         results = self.client.search(
             collection_name=collection_name,
@@ -153,3 +155,50 @@ class QdrantManager:
             # filtered_results.append(result)
 
         return filtered_results
+
+
+    def add_texts(self, collection_name: str, texts: list):
+        """
+        Add multiple texts to a specific collection in a single batch.
+
+        :param collection_name: Name of the collection
+        :param texts: List of texts to be added
+        """
+        # Ensure collection exists
+        if collection_name not in self.collections:
+            raise ValueError(f"Collection '{collection_name}' does not exist")
+
+        # Get collection metadata
+        collection_metadata = self.collections[collection_name]
+
+        # Prepare points for batch insertion
+        points = []
+        total = len(texts)
+
+        embedding_response = self.google_genai.models.embed_content(
+            model="gemini-embedding-001",
+            contents=texts,
+            config=types.EmbedContentConfig(output_dimensionality=768)
+        )
+        time.sleep(1)  # Add a small delay to avoid hitting rate limits
+        embeddings = embedding_response.embeddings
+
+        for i, text in enumerate(texts):
+            embedding = embeddings[i].values
+            metadata = {"text": text}
+            point = PointStruct(
+                id=i + collection_metadata['current_id'],  # Generate a unique ID
+                vector=embedding,
+                payload=metadata
+            )
+            points.append(point)
+
+        # Perform batch upsert
+        self.client.upsert(
+            collection_name=collection_name,
+            points=points
+        )
+
+        # Update collection metadata
+        collection_metadata['current_id'] += len(points)
+        print(f"Inserted {len(points)} points into '{collection_name}' collection.")

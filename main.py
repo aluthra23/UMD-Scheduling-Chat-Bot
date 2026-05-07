@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 
 from qdrant_manager import QdrantManager
 import streamlit as st
+from tqdm import tqdm
 
 load_dotenv()
 
@@ -20,20 +21,23 @@ gen_eds_df = pd.read_csv('./gen_eds/gen_eds.csv')
 
 
 
-for df in courses_df, course_catalog_df, prefixes_df, gen_eds_df:
+all_texts = []
+
+for df in [courses_df, course_catalog_df, prefixes_df, gen_eds_df]:
     for _, row in df.iterrows():
-        # Concatenate each property for each element which is appended into the list of documents
-        content = []
-        for col in df.columns:
-            if row[col] != "":
-                content.append(f"{col}: {row[col]}")
-
-        content = " ".join(content)
-        qdrant_manager.add_text(
-            collection_name=collection_name,
-            text=content
+        content = " ".join(
+            f"{col}: {row[col]}" for col in df.columns if pd.notna(row[col]) and row[col] != ""
         )
-        print(content)
+        all_texts.append(content)
 
+# print("Done adding all texts!")
+
+# Batch processing with tqdm progress bar
+batch_size = 1
+for i in tqdm(range(0, len(all_texts), batch_size), desc="Inserting batches", unit="batch"):
+    batch = all_texts[i:i + batch_size]
+    qdrant_manager.add_texts(collection_name=collection_name, texts=batch)
+
+print(f"Inserted {len(all_texts)} items")
 
 qdrant_manager.client.close()

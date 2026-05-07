@@ -57,7 +57,6 @@ CLAX,Classics Education Abroad
 CLFS,Chemical and Life Sciences
 CMLT,Comparative Literature
 CMLX,Comparative Literature Education Abroad
-CMNS,"Computer, Math, and Natural Sciences"
 CMSC,Computer Science
 COMM,Communication
 COMX,Communication Education Abroad
@@ -76,7 +75,6 @@ CPSG,College Park Scholars-Science and Global Change
 CPSN,College Park Scholars-International Studies
 CPSP,College Park Scholars Program
 CPSS,"College Park Scholars-Science, Technology and Society"
-CRLN,Carillon Communities
 DANC,Dance
 DATA,Data Science and Analytics
 EALL,East Asian Languages and Literatures
@@ -111,6 +109,7 @@ ENRE,Reliability Engineering
 ENSE,Systems Engineering
 ENSP,Environmental Science and Policy
 ENST,Environmental Science and Technology
+ENTE,Engineering Test and Evaluation
 ENTM,Entomology
 ENTS,Telecommunications
 ENVH,Environmental and Occupational Health
@@ -124,6 +123,7 @@ GEMS,Gemstone
 GEOG,Geographical Sciences
 GEOL,Geology
 GERS,German Studies
+GFPL,Global and Foreign Policy
 GREK,Greek
 GVPT,Government and Politics
 HACS,ACES-Cybersecurity
@@ -167,6 +167,7 @@ LEAD,Leadership Education and Development
 LGBT,Lesbian Gay Bisexual Transgender Studies
 LGBX,Lesbian Gay Bisexual Transgender Studies Education Abroad
 LING,Linguistics
+MAIT,Masters in the Mathematics of Advanced Industrial Tech
 MATH,Mathematics
 MEES,Marine-Estuarine-Environmental Sciences
 MIEH,Maryland Institute for Applied Environmental Health
@@ -184,7 +185,8 @@ NACS,Neuroscience & Cognitive Science
 NAVY,Navy
 NEUR,Neuroscience
 NFSC,Nutrition and Food Science
-NIAS,National Institute of Aeronautics - North Carolina
+NIAP,National Institute of Aeronautics - Va Tech
+NIAV,National Institute of Aeronautics - Univ of VA
 OURS,Office of Undergraduate Research
 PEER,Health Center
 PERS,Persian
@@ -203,6 +205,8 @@ RDEV,Real Estate Development
 RELS,Religious Studies
 RELX,Religious Studies Education Abroad
 RUSS,Russian
+SDSB,"Social Data Science, BSOS"
+SDSI,"Social Data Science, INFO"
 SLAA,Second Language Acquisition and Application
 SLLC,"School of Languages, Literatures and Cultures"
 SLLX,"School of Languages, Literatures & Cultures Education Abroad"
