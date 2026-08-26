@@ -1,0 +1,83 @@
+name: Upload next published UMD term
+
+on:
+  schedule:
+    - cron: '17 10 * * *'
+  workflow_dispatch:
+    inputs:
+      term_id:
+        description: 'Optional YYYY01 or YYYY08 term to upload. Leave blank to detect the next term.'
+        required: false
+        type: string
+
+concurrency:
+  group: umd-term-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    env:
+      QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+      QDRANT_LINK: ${{ secrets.QDRANT_LINK }}
+      HF_HOME: ${{ github.workspace }}/.cache/huggingface
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Restore embedding-model cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/huggingface
+          key: fastembed-${{ runner.os }}-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            fastembed-${{ runner.os }}-
+
+      - name: Install scraper dependencies
+        run: pip install -r requirements.txt
+
+      - name: Select target term
+        id: term
+        shell: bash
+        run: |
+          if [[ -n "${{ inputs.term_id }}" ]]; then
+            term_id="${{ inputs.term_id }}"
+          else
+            term_id="$(python scripts/next_term.py)"
+          fi
+          echo "term_id=$term_id" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the term is published
+        id: availability
+        shell: bash
+        run: |
+          set +e
+          python scripts/check_term.py "${{ steps.term.outputs.term_id }}"
+          status=$?
+          set -e
+          if [[ $status -eq 10 ]]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          elif [[ $status -eq 0 ]]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            exit $status
+          fi
+
+      - name: Scrape and upload published term
+        if: steps.availability.outputs.available == 'true'
+        run: python scripts/scrape_and_upload.py "${{ steps.term.outputs.term_id }}"
+
+      - name: Workflow summary
+        shell: bash
+        run: |
+          if [[ "${{ steps.availability.outputs.available }}" == "true" ]]; then
+            echo "Uploaded ${{ steps.term.outputs.term_id }}." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "${{ steps.term.outputs.term_id }} is not published yet; no scrape was run." >> "$GITHUB_STEP_SUMMARY"
+          fi
