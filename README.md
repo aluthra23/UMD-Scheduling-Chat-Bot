@@ -29,6 +29,30 @@ The uploader uses the FP32 `sentence-transformers/all-MiniLM-L6-v2` model throug
 
 If the model or its numeric precision is changed—for example, to an INT8 quantized build—the existing Qdrant vectors must not be reused. Recreate the collection and re-embed all source data so document and query vectors remain compatible. See the UI README for the quantization tradeoffs and migration checklist.
 
+## Automated term refresh workflow
+
+`.github/workflows/upload-next-term.yml` runs at minute `00` of every hour (UTC). It requires the GitHub Actions secrets `QDRANT_API_KEY` and `QDRANT_LINK`.
+
+The workflow considers only Qdrant collections named as UMD term IDs (`YYYY01` for spring and `YYYY08` for fall):
+
+1. Find the newest existing term collection and calculate the next term.
+2. Check `CMSC351` using the UMD Courses API for that next term.
+3. If the next term is published, scrape and synchronize that new term. A new collection receives a full initial upload.
+4. If it is not published (`404` with `Course not found!`), scrape and synchronize the newest existing term instead. API/network failures fail the workflow rather than being treated as an unavailable term.
+
+Each scrape includes open and closed sections. The uploader assigns deterministic UUIDs and hashes to every schedule, catalog, prefix, and GenEd document. On later runs it embeds and upserts only changed/new documents, and deletes only records that disappeared from the scrape. This avoids deleting the current term collection during ordinary hourly refreshes.
+
+Existing legacy collections without `document_key` and `content_hash` metadata receive one full rebuild on their first incremental refresh. After that migration, unchanged data causes no embedding or Qdrant write.
+
+To run it manually, open the workflow in the repository's **Actions** tab and use **Run workflow**. Leave the optional term blank to use the automatic new-term-or-latest-refresh decision; provide a term ID only to force a refresh of that specific term.
+
+Important files for maintenance:
+
+- `scripts/next_term.py` — newest/next term selection from Qdrant.
+- `scripts/check_term.py` — next-term publication check.
+- `scripts/scrape_and_upload.py` — orchestrates the three scrapers and upload.
+- `main.py` and `qdrant_manager.py` — stable IDs, content hashes, and incremental Qdrant synchronization.
+
 ## Contributions
 
 Contributions are welcome! Please fork the repository and submit a pull request with your changes. Ensure your code follows the project's coding standards and includes appropriate tests.
