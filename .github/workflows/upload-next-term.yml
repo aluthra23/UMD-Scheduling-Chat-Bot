@@ -1,4 +1,4 @@
-name: Upload next published UMD term
+name: Refresh current or upload next UMD term
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       term_id:
-        description: 'Optional YYYY01 or YYYY08 term to upload. Leave blank to detect the next term.'
+        description: 'Optional YYYY01 or YYYY08 term to refresh. Leave blank to detect the next term or refresh the latest term.'
         required: false
         type: string
 
@@ -47,37 +47,45 @@ jobs:
         shell: bash
         run: |
           if [[ -n "${{ inputs.term_id }}" ]]; then
-            term_id="${{ inputs.term_id }}"
+            latest_term="${{ inputs.term_id }}"
+            next_term="${{ inputs.term_id }}"
+            echo "manual=true" >> "$GITHUB_OUTPUT"
           else
-            term_id="$(python scripts/next_term.py)"
+            latest_term="$(python scripts/next_term.py --latest)"
+            next_term="$(python scripts/next_term.py)"
+            echo "manual=false" >> "$GITHUB_OUTPUT"
           fi
-          echo "term_id=$term_id" >> "$GITHUB_OUTPUT"
+          echo "latest_term=$latest_term" >> "$GITHUB_OUTPUT"
+          echo "next_term=$next_term" >> "$GITHUB_OUTPUT"
 
-      - name: Check whether the term is published
+      - name: Choose new or current term to refresh
         id: availability
         shell: bash
         run: |
+          if [[ "${{ steps.term.outputs.manual }}" == "true" ]]; then
+            echo "target_term=${{ steps.term.outputs.latest_term }}" >> "$GITHUB_OUTPUT"
+            echo "mode=manual refresh" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
           set +e
-          python scripts/check_term.py "${{ steps.term.outputs.term_id }}"
+          python scripts/check_term.py "${{ steps.term.outputs.next_term }}"
           status=$?
           set -e
-          if [[ $status -eq 10 ]]; then
-            echo "available=false" >> "$GITHUB_OUTPUT"
-          elif [[ $status -eq 0 ]]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
+          if [[ $status -eq 0 ]]; then
+            echo "target_term=${{ steps.term.outputs.next_term }}" >> "$GITHUB_OUTPUT"
+            echo "mode=newly published term" >> "$GITHUB_OUTPUT"
+          elif [[ $status -eq 10 ]]; then
+            echo "target_term=${{ steps.term.outputs.latest_term }}" >> "$GITHUB_OUTPUT"
+            echo "mode=latest-term refresh" >> "$GITHUB_OUTPUT"
           else
             exit $status
           fi
 
-      - name: Scrape and upload published term
-        if: steps.availability.outputs.available == 'true'
-        run: python scripts/scrape_and_upload.py "${{ steps.term.outputs.term_id }}"
+      - name: Scrape and refresh selected term
+        run: python scripts/scrape_and_upload.py "${{ steps.availability.outputs.target_term }}" --recreate
 
       - name: Workflow summary
         shell: bash
         run: |
-          if [[ "${{ steps.availability.outputs.available }}" == "true" ]]; then
-            echo "Uploaded ${{ steps.term.outputs.term_id }}." >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "${{ steps.term.outputs.term_id }} is not published yet; no scrape was run." >> "$GITHUB_STEP_SUMMARY"
-          fi
+          echo "Refreshed ${{ steps.availability.outputs.target_term }} (${{ steps.availability.outputs.mode }})." >> "$GITHUB_STEP_SUMMARY"
