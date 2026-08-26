@@ -1,4 +1,5 @@
 import requests
+import time
 from bs4 import BeautifulSoup
 import csv
 import pandas as pd
@@ -9,8 +10,14 @@ def soc_scraper(file_path='umd_course_prefixes.csv'):
     url = 'https://app.testudo.umd.edu/soc/'
 
     # Send a GET request to the page
-    response = requests.get(url)
-    response.raise_for_status()  # Check that the request was successful
+    response = None
+    for attempt in range(3):
+        response = requests.get(url, timeout=30)
+        if response.ok:
+            break
+        if attempt < 2:
+            time.sleep(5 * (attempt + 1))
+    response.raise_for_status()
 
     # Parse the HTML content of the page
     soup = BeautifulSoup(response.content, 'html.parser')
