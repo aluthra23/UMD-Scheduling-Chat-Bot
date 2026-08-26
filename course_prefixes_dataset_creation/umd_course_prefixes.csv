@@ -4,6 +4,7 @@ AAST,Asian American Studies
 ABRM,Anti-Black Racism
 AGNR,Agriculture and Natural Resources
 AGST,Agricultural Science and Technology
+AIME,Artificial Intelligence Interdisciplinary Education
 AMSC,Applied Mathematics & Scientific Computation
 AMST,American Studies
 ANSC,Animal Science
@@ -32,6 +33,7 @@ BISI,Biological Sciences
 BMGT,Business and Management
 BMIN,General Business Minor
 BMSO,Online Business MS Programs
+BOIS,Online MS Info Systems and Artificial Intelligence
 BSCI,Biological Sciences Program
 BSOS,Behavioral and Social Sciences
 BSST,Terrorism Studies
@@ -40,6 +42,7 @@ BUDT,Decision and Information Technologies
 BUFN,Finance
 BULM,"Logistics, Business, and Public Policy"
 BUMK,Marketing
+BUMO,Management and Organization
 BUSI,Part-Time MBA Program
 BUSM,Full-Time MBA Program
 BUSO,Online MBA Program
@@ -57,6 +60,7 @@ CLAX,Classics Education Abroad
 CLFS,Chemical and Life Sciences
 CMLT,Comparative Literature
 CMLX,Comparative Literature Education Abroad
+CMNS,"Computer, Math, and Natural Sciences"
 CMSC,Computer Science
 COMM,Communication
 COMX,Communication Education Abroad
@@ -75,6 +79,7 @@ CPSG,College Park Scholars-Science and Global Change
 CPSN,College Park Scholars-International Studies
 CPSP,College Park Scholars Program
 CPSS,"College Park Scholars-Science, Technology and Society"
+CRLN,Carillon Communities
 DANC,Dance
 DATA,Data Science and Analytics
 EALL,East Asian Languages and Literatures
@@ -84,7 +89,6 @@ EDCP,Education Counseling and Personnel Services
 EDDI,Education Dialogues
 EDHD,"Education, Human Development"
 EDHI,"Education Leadership, Higher Ed and International Ed"
-EDMS,"Measurement, Statistics, and Evaluation"
 EDPS,Education Policy Studies
 EDSP,"Education, Special"
 EDUC,Education
@@ -124,6 +128,8 @@ GEOG,Geographical Sciences
 GEOL,Geology
 GERS,German Studies
 GFPL,Global and Foreign Policy
+GLBC,Global Culture and Thought
+GRAD,Graduate School
 GREK,Greek
 GVPT,Government and Politics
 HACS,ACES-Cybersecurity
@@ -133,7 +139,7 @@ HEBR,Hebrew
 HEIP,Entrepreneurship and Innovation
 HESI,"Higher Ed, Student Affairs, and International Ed Policy"
 HESP,Hearing and Speech Sciences
-HGLO,Honors Global Communities
+HGLO,Honors Global Challenges and Solutions
 HHUM,Honors Humanities
 HISP,Historic Preservation
 HIST,History
@@ -164,10 +170,9 @@ LASX,Certificate in Latin American Studies Education Abroad
 LATN,Latin
 LBSC,Library Science
 LEAD,Leadership Education and Development
-LGBT,Lesbian Gay Bisexual Transgender Studies
-LGBX,Lesbian Gay Bisexual Transgender Studies Education Abroad
+LGBT,LGBTQ Studies
+LGBX,LGBTQ Studies Education Abroad
 LING,Linguistics
-MAIT,Masters in the Mathematics of Advanced Industrial Tech
 MATH,Mathematics
 MEES,Marine-Estuarine-Environmental Sciences
 MIEH,Maryland Institute for Applied Environmental Health
@@ -185,13 +190,12 @@ NACS,Neuroscience & Cognitive Science
 NAVY,Navy
 NEUR,Neuroscience
 NFSC,Nutrition and Food Science
-NIAP,National Institute of Aeronautics - Va Tech
-NIAV,National Institute of Aeronautics - Univ of VA
+NIAS,National Institute of Aeronautics - North Carolina
 OURS,Office of Undergraduate Research
 PEER,Health Center
 PERS,Persian
 PHIL,Philosophy
-PHIX, Philosophy Education Abroad
+PHIX,Philosophy Education Abroad
 PHPE,"Philosophy, Politics, and Economics"
 PHPX,"Philosophy, Politics, and Economics Education Abroad"
 PHSC,Public Health Science
@@ -199,6 +203,7 @@ PHYS,Physics
 PLCY,Public Policy
 PLSC,Plant Sciences
 PORT,Portuguese
+PSIT,Public Service Interpreting and Translation
 PSYC,Psychology
 QMMS,Quantitative Methodology: Measurement and Statistics
 RDEV,Real Estate Development

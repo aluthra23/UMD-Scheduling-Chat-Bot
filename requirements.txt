@@ -2,7 +2,7 @@
 # annotated-types==0.7.0
 # anyio==4.7.0
 # attrs==24.3.0
-# beautifulsoup4==4.12.3
+beautifulsoup4>=4.12,<5
 # blinker==1.9.0
 # cachetools==5.5.0
 # certifi==2024.12.14
@@ -20,7 +20,7 @@
 # google-api-python-client==2.157.0
 # google-auth==2.37.0
 # google-auth-httplib2==0.2.0
-# google-generativeai==0.8.3
+fastembed>=0.8,<1
 # googleapis-common-protos==1.66.0
 # grpcio==1.68.1
 # grpcio-status==1.68.1
@@ -48,7 +48,7 @@
 # numpy==2.2.1
 # openai==1.59.3
 # packaging==24.2
-# pandas==2.2.3
+pandas>=2.2,<3
 # pillow==11.1.0
 # portalocker==2.10.1
 # proto-plus==1.25.0
@@ -62,13 +62,13 @@
 # Pygments==2.18.0
 # pyparsing==3.2.1
 # python-dateutil==2.9.0.post0
-# python-dotenv==1.0.1
+python-dotenv>=1.0,<2
 # pytz==2024.2
 # PyYAML==6.0.2
-# qdrant-client==1.12.2
+qdrant-client>=1.15,<2
 # referencing==0.35.1
 # regex==2024.11.6
-# requests==2.32.3
+requests>=2.32,<3
 # rich==13.9.4
 # rpds-py==0.22.3
 # rsa==4.9
@@ -89,7 +89,7 @@
 # toml==0.10.2
 # torch==2.5.1
 # tornado==6.4.2
-# tqdm==4.67.1
+tqdm>=4.67,<5
 # transformers==4.47.1
 # typing_extensions==4.12.2
 # tzdata==2024.2

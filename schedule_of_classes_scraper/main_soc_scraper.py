@@ -12,11 +12,12 @@ def update_current_semester_coursework_data(file_path='umd_schedule_of_classes_c
         # Write the header row
         writer.writerow(constants.CSV_SOC_HEADER)
 
-        update_umd_courses(file_path)
+        update_umd_courses(course_prefixes_path)
         df = pd.read_csv(course_prefixes_path)
 
         # Iterate over each course acronym
         for course_acronym in df["COURSE PREFIX"]:
             soc_scraper.scrape_course_data(course_acronym, file)
 
-update_current_semester_coursework_data()
+if __name__ == "__main__":
+    update_current_semester_coursework_data()

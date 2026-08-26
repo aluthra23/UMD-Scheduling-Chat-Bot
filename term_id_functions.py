@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 
@@ -5,6 +6,10 @@ def update_term_id():
     """
     Updates the term_id for the current semester
     """
+    configured_term_id = os.getenv("UMD_TERM_ID")
+    if configured_term_id:
+        return configured_term_id.strip()
+
     now_time = datetime.now()
     current_day = now_time.day
     current_month = now_time.month

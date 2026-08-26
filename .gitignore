@@ -2,5 +2,6 @@
 .streamlit
 __pycache__/
 .venv/
+.python-deps/
 venv/
 .DS_Store

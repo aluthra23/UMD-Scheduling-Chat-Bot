@@ -23,6 +23,12 @@ The UMD Scheduling Chatbot is an AI-powered assistant designed to help students 
 
 Once the application is running, you can interact with the chatbot via the Streamlit interface. Enter your query in the chat input, and the chatbot will respond with detailed information about UMD courses and schedules.
 
+## Vector Compatibility
+
+The uploader uses the FP32 `sentence-transformers/all-MiniLM-L6-v2` model through FastEmbed. It creates normalized, 384-dimensional vectors for Qdrant. The JavaScript UI must use the matching model configuration when embedding queries.
+
+If the model or its numeric precision is changed—for example, to an INT8 quantized build—the existing Qdrant vectors must not be reused. Recreate the collection and re-embed all source data so document and query vectors remain compatible. See the UI README for the quantization tradeoffs and migration checklist.
+
 ## Contributions
 
 Contributions are welcome! Please fork the repository and submit a pull request with your changes. Ensure your code follows the project's coding standards and includes appropriate tests.

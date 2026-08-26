@@ -1,204 +1,67 @@
-from qdrant_client import QdrantClient
-from qdrant_client.http.models import VectorParams, PointStruct, Distance
-# from sentence_transformers import SentenceTransformer
-from google import genai
 import os
-from google.genai import types
-import time
+
+from fastembed import TextEmbedding
+from qdrant_client import QdrantClient
+from qdrant_client.http.models import (
+    Distance,
+    PayloadSchemaType,
+    PointStruct,
+    VectorParams,
+)
 
 
-# Environment setup
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
 class QdrantManager:
-    def __init__(self, qdrant_api_key: str, google_api_key: str, host="localhost", port=6333):
-        """
-        Initialize Qdrant client with support for multiple collections
+    EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
+    EMBEDDING_DIMENSIONS = 384
 
-        :param qdrant_api_key: qdrant api key
-        :param google_api_key: google api key
-        :param host: Qdrant server host
-        :param port: Qdrant server port
-        """
-        self.client = QdrantClient(url=host, port=port, api_key=qdrant_api_key)
-
-        # Store collections with their metadata
+    def __init__(self, qdrant_api_key: str, host: str = "localhost"):
+        self.client = QdrantClient(url=host, api_key=qdrant_api_key)
         self.collections = {}
+        self.model = TextEmbedding(model_name=self.EMBEDDING_MODEL)
 
-        # Shared embedding model
-        # self.model = SentenceTransformer('all-MiniLM-L6-v2')
-
-        # Configure Gemini
-        # Initialize the embedding model
-        self.google_genai = genai.Client(api_key=google_api_key)
-
-
-    def create_collection(self, collection_name, vector_size=768):
-        """
-        Create a new collection with specific parameters
-
-        :param collection_name: Unique name for the collection
-        :param vector_size: Dimension of embedding vectors
-        :return: Collection metadata dictionary
-        """
-        try:
-            # Delete existing collection if it exists
+    def create_collection(self, collection_name, recreate=False):
+        if self.client.collection_exists(collection_name):
+            if not recreate:
+                raise ValueError(
+                    f"Collection '{collection_name}' already exists. "
+                    "Pass recreate=True to replace it."
+                )
             self.client.delete_collection(collection_name)
-        except Exception as e:
-            pass
 
-        # Create new collection
         self.client.create_collection(
             collection_name=collection_name,
             vectors_config=VectorParams(
-                size=vector_size,
-                distance=Distance.COSINE
-            )
+                size=self.EMBEDDING_DIMENSIONS,
+                distance=Distance.COSINE,
+            ),
         )
-
-        # Initialize collection metadata
-        collection_metadata = {
-            'current_id': 0,
-        }
-
-        self.collections[collection_name] = collection_metadata
-
+        self.client.create_payload_index(
+            collection_name=collection_name,
+            field_name="course_number",
+            field_schema=PayloadSchemaType.KEYWORD,
+        )
+        metadata = {"current_id": 0}
+        self.collections[collection_name] = metadata
         print(f"Collection '{collection_name}' created successfully")
-        return collection_metadata
+        return metadata
 
-    def delete_collection(self, collection_name):
+    def add_texts(self, collection_name: str, texts: list[str], payloads: list[dict]):
         if collection_name not in self.collections:
             raise ValueError(f"Collection '{collection_name}' does not exist")
 
-        self.client.delete_collection(collection_name)
-        self.collections.pop(collection_name)
-
-    def add_text(self, collection_name: str, text: str):
-        """
-        Add text to a specific collection
-
-        :param collection_name: Name of the collection
-        :param text: Text to be added
-        """
-        # Ensure collection exists
-        if collection_name not in self.collections:
-            raise ValueError(f"Collection '{collection_name}' does not exist")
-
-        # Get collection metadata
-        collection_metadata = self.collections[collection_name]
-
-        # Encode text
-        embedding_response = genai.embed_content(
-            model="models/text-embedding-004",
-            content=text,
-            config=types.EmbedContentConfig(output_dimensionality=768)
-        )
-
-        embedding = embedding_response['embedding']
-
-        metadata = {
-            "text": text,
-        }
-
-        self.client.upsert(
-            collection_name=collection_name,
-            points=[
-                PointStruct(
-                    id=collection_metadata['current_id'],
-                    vector=embedding,
-                    payload=metadata
-                )
-            ]
-        )
-
-        # Increment ID
-        collection_metadata['current_id'] += 1
-
-    def search_similar(self, collection_name, prompt, limit: int = 30, similarity_threshold: float = 0.2):
-        """
-        Search for similar texts in a specific collection
-
-        :param collection_name: Name of the collection to search
-        :param prompt: Search query
-        :param limit: Maximum number of results
-        :param similarity_threshold: Minimum similarity score
-        :return: Filtered search results
-        """
-        # Ensure collection exists
-        # if collection_name not in self.collections:
-        #     raise ValueError(f"Collection '{collection_name}' does not exist")
-
-        # Get embedding
-        embedding_response = self.google_genai.models.embed_content(
-            model="gemini-embedding-001",
-            contents=prompt
-        )
-
-        # Access the values directly from the embedding response
-        embedding = embedding_response.embeddings[0].values
-
-        results = self.client.search(
-            collection_name=collection_name,
-            query_vector=embedding,
-            limit=limit,
-            with_payload=True
-        )
-
-        filtered_results = []
-
-        for result in results:
-            if result.score >= similarity_threshold:
-                filtered_results.append(result)
-                # print(f"Document: {result.payload['text']}")
-                # print(f"Score: {result.score}\n\n")
-            # filtered_results.append(result)
-
-        return filtered_results
-
-
-    def add_texts(self, collection_name: str, texts: list):
-        """
-        Add multiple texts to a specific collection in a single batch.
-
-        :param collection_name: Name of the collection
-        :param texts: List of texts to be added
-        """
-        # Ensure collection exists
-        if collection_name not in self.collections:
-            raise ValueError(f"Collection '{collection_name}' does not exist")
-
-        # Get collection metadata
-        collection_metadata = self.collections[collection_name]
-
-        # Prepare points for batch insertion
-        points = []
-        total = len(texts)
-
-        embedding_response = self.google_genai.models.embed_content(
-            model="gemini-embedding-001",
-            contents=texts,
-            config=types.EmbedContentConfig(output_dimensionality=768)
-        )
-        time.sleep(1)  # Add a small delay to avoid hitting rate limits
-        embeddings = embedding_response.embeddings
-
-        for i, text in enumerate(texts):
-            embedding = embeddings[i].values
-            metadata = {"text": text}
-            point = PointStruct(
-                id=i + collection_metadata['current_id'],  # Generate a unique ID
-                vector=embedding,
-                payload=metadata
+        current_id = self.collections[collection_name]["current_id"]
+        embeddings = self.model.embed(texts, batch_size=len(texts), parallel=None)
+        points = [
+            PointStruct(
+                id=current_id + index,
+                vector=embedding.tolist(),
+                payload={"text": text, **payloads[index]},
             )
-            points.append(point)
-
-        # Perform batch upsert
-        self.client.upsert(
-            collection_name=collection_name,
-            points=points
-        )
-
-        # Update collection metadata
-        collection_metadata['current_id'] += len(points)
+            for index, (text, embedding) in enumerate(zip(texts, embeddings))
+        ]
+        self.client.upsert(collection_name=collection_name, points=points)
+        self.collections[collection_name]["current_id"] += len(points)
         print(f"Inserted {len(points)} points into '{collection_name}' collection.")
