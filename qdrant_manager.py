@@ -5,6 +5,7 @@ from qdrant_client import QdrantClient
 from qdrant_client.http.models import (
     Distance,
     PayloadSchemaType,
+    PointIdsList,
     PointStruct,
     VectorParams,
 )
@@ -19,7 +20,6 @@ class QdrantManager:
 
     def __init__(self, qdrant_api_key: str, host: str = "localhost"):
         self.client = QdrantClient(url=host, api_key=qdrant_api_key)
-        self.collections = {}
         self.model = TextEmbedding(model_name=self.EMBEDDING_MODEL)
 
     def create_collection(self, collection_name, recreate=False):
@@ -43,10 +43,33 @@ class QdrantManager:
             field_name="course_number",
             field_schema=PayloadSchemaType.KEYWORD,
         )
-        metadata = {"current_id": 0}
-        self.collections[collection_name] = metadata
         print(f"Collection '{collection_name}' created successfully")
-        return metadata
+
+    def existing_documents(self, collection_name: str):
+        documents = {}
+        offset = None
+        while True:
+            points, offset = self.client.scroll(collection_name, limit=256, offset=offset, with_payload=["document_key", "content_hash"], with_vectors=False)
+            for point in points:
+                payload = point.payload or {}
+                if not payload.get("document_key") or not payload.get("content_hash"):
+                    return None
+                documents[payload["document_key"]] = {"id": point.id, "content_hash": payload["content_hash"]}
+            if offset is None:
+                return documents
+
+    def upsert_documents(self, collection_name: str, documents: list[dict]):
+        if not documents:
+            return
+        embeddings = self.model.embed([document["text"] for document in documents], batch_size=len(documents), parallel=None)
+        self.client.upsert(collection_name=collection_name, points=[
+            PointStruct(id=document["id"], vector=embedding.tolist(), payload=document["payload"])
+            for document, embedding in zip(documents, embeddings)
+        ])
+
+    def delete_points(self, collection_name: str, point_ids: list[str]):
+        if point_ids:
+            self.client.delete(collection_name=collection_name, points_selector=PointIdsList(points=point_ids))
 
     def add_texts(self, collection_name: str, texts: list[str], payloads: list[dict]):
         if collection_name not in self.collections:

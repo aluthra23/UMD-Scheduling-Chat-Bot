@@ -83,7 +83,7 @@ jobs:
           fi
 
       - name: Scrape and refresh selected term
-        run: python scripts/scrape_and_upload.py "${{ steps.availability.outputs.target_term }}" --recreate
+        run: python scripts/scrape_and_upload.py "${{ steps.availability.outputs.target_term }}"
 
       - name: Workflow summary
         shell: bash
