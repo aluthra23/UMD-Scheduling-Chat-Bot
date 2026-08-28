@@ -2,7 +2,7 @@ name: Refresh current or upload next UMD term
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    - cron: '17 * * * *'
   workflow_dispatch:
     inputs:
       term_id:

@@ -15,7 +15,7 @@ For example, `202608` represents Fall 2026. Each collection includes schedule se
 
 ## Hourly GitHub Actions workflow
 
-The workflow at `.github/workflows/upload-next-term.yml` runs at minute `00` of every hour, in UTC. It needs these repository Actions secrets:
+The workflow at `.github/workflows/upload-next-term.yml` runs at minute `17` of every hour, in UTC. It needs these repository Actions secrets:
 
 - `QDRANT_API_KEY`
 - `QDRANT_LINK`
