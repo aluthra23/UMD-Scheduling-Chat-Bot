@@ -11,7 +11,7 @@ Qdrant uses one collection per UMD term ID:
 - `YYYY01` — spring term
 - `YYYY08` — fall term
 
-For example, `202608` represents Fall 2026. Each collection includes schedule sections (including open and closed sections), catalog data, course prefixes, and GenEd definitions. Vectors use FP32 `sentence-transformers/all-MiniLM-L6-v2` embeddings with 384 dimensions.
+For example, `202701` represents Spring 2027. Each collection includes schedule sections (including open and closed sections), catalog data, course prefixes, and GenEd definitions. Vectors use FP32 `sentence-transformers/all-MiniLM-L6-v2` embeddings with 384 dimensions.
 
 ## Hourly GitHub Actions workflow
 
@@ -60,13 +60,13 @@ QDRANT_LINK=https://...
 Run a complete scrape and sync for a specific term:
 
 ```bash
-ENV_FILE=.env .venv/bin/python scripts/scrape_and_upload.py 202608
+ENV_FILE=.env .venv/bin/python scripts/scrape_and_upload.py 202701
 ```
 
 Pass `--recreate` only when a full rebuild is intentionally required:
 
 ```bash
-ENV_FILE=.env .venv/bin/python scripts/scrape_and_upload.py 202608 --recreate
+ENV_FILE=.env .venv/bin/python scripts/scrape_and_upload.py 202701 --recreate
 ```
 
 ## Important files
