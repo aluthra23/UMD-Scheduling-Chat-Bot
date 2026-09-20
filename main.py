@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 from tqdm import tqdm
 
 from qdrant_manager import QdrantManager
+from sync_utils import stale_document_ids
 
 
 load_dotenv(os.getenv("ENV_FILE", ".env"))
@@ -16,6 +17,7 @@ parser.add_argument("--collection", default=os.getenv("QDRANT_COLLECTION", "2026
 parser.add_argument("--batch-size", type=int, default=100)
 parser.add_argument("--recreate", action="store_true", help="Force a one-time full rebuild.")
 parser.add_argument("--dataset", choices=("all", "gen-eds"), default="all")
+parser.add_argument("--allow-mass-delete", action="store_true", help="Skip the safety check that aborts when a scrape lost most of its documents.")
 args = parser.parse_args()
 
 if not os.getenv("QDRANT_API_KEY") or not os.getenv("QDRANT_LINK"):
@@ -71,7 +73,7 @@ if existing is None:
     print("Full rebuild: collection has no incremental metadata")
 
 changed = [document for key, document in documents.items() if existing.get(key, {}).get("content_hash") != document["payload"]["content_hash"]]
-stale_ids = [metadata["id"] for key, metadata in existing.items() if key not in documents]
+stale_ids = stale_document_ids(existing, documents, {source for source, _ in datasets}, args.allow_mass_delete)
 print(f"Upserting {len(changed)} changed/new documents; deleting {len(stale_ids)} stale documents")
 for start in tqdm(range(0, len(changed), args.batch_size), desc="Upserting batches", unit="batch"):
     manager.upsert_documents(args.collection, changed[start:start + args.batch_size])

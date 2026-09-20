@@ -70,21 +70,3 @@ class QdrantManager:
     def delete_points(self, collection_name: str, point_ids: list[str]):
         if point_ids:
             self.client.delete(collection_name=collection_name, points_selector=PointIdsList(points=point_ids))
-
-    def add_texts(self, collection_name: str, texts: list[str], payloads: list[dict]):
-        if collection_name not in self.collections:
-            raise ValueError(f"Collection '{collection_name}' does not exist")
-
-        current_id = self.collections[collection_name]["current_id"]
-        embeddings = self.model.embed(texts, batch_size=len(texts), parallel=None)
-        points = [
-            PointStruct(
-                id=current_id + index,
-                vector=embedding.tolist(),
-                payload={"text": text, **payloads[index]},
-            )
-            for index, (text, embedding) in enumerate(zip(texts, embeddings))
-        ]
-        self.client.upsert(collection_name=collection_name, points=points)
-        self.collections[collection_name]["current_id"] += len(points)
-        print(f"Inserted {len(points)} points into '{collection_name}' collection.")

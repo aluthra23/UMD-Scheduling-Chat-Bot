@@ -1,6 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
-from helping_files import helper
+from helping_files import helper, http_utils
 import csv
 
 
@@ -8,8 +8,8 @@ def scrape_course_data(course_acronym, file):
     base_url = "https://academiccatalog.umd.edu/undergraduate/approved-courses/"
     url = f"{base_url}{course_acronym.lower()}/"
 
-    response = requests.get(url)
-    if response.status_code != 200:
+    response = http_utils.fetch(url, allow_not_found=True)
+    if response is None:
         return
 
     # Parse the HTML content

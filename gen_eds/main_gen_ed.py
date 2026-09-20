@@ -1,32 +1,29 @@
-from helping_files import constants
+from helping_files import constants, http_utils
 import csv
-import requests
 from bs4 import BeautifulSoup
 from term_id_functions import update_term_id
 
-with open('gen_eds.csv', mode='w', newline='') as file:
-    writer = csv.writer(file)
-    # Write the header row
-    writer.writerow(constants.CSV_GEN_EDS_HEADER)
-    url = f"https://app.testudo.umd.edu/soc/gen-ed/{update_term_id()}/"
 
-    response = requests.get(url)
-    if response.status_code != 200:
-        exit()
-
+def scrape_gen_eds(term_id):
+    response = http_utils.fetch(f"https://app.testudo.umd.edu/soc/gen-ed/{term_id}/")
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Find all courses listed on the page
-    gen_eds = soup.find_all('div', class_='subcategory')
+    rows = []
+    for entry in soup.find_all('div', class_='subcategory'):
+        words = entry.text.strip().split('(')
+        full_form = words[0].strip()
+        acronym = words[1][:-1].strip()
+        rows.append([acronym, full_form])
 
-    data = []
-    # Iterate over each course acronym
-    for entry in gen_eds:
-        gen_ed = entry.text.strip()
+    if not rows:
+        raise RuntimeError(f"No gen-ed categories found for term {term_id}")
+    return rows
 
-        words = gen_ed.split('(')
 
-        full_form = f"{words[0].strip()}"
-        acronym = f"{words[1][:-1].strip()}"
+if __name__ == "__main__":
+    rows = scrape_gen_eds(update_term_id())
 
-        writer.writerow([acronym, full_form])
+    with open('gen_eds.csv', mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(constants.CSV_GEN_EDS_HEADER)
+        writer.writerows(rows)

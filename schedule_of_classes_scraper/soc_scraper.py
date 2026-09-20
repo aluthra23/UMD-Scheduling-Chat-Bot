@@ -4,7 +4,9 @@ from bs4 import BeautifulSoup
 import csv
 from term_id_functions import update_term_id
 
-from helping_files import helper
+from helping_files import helper, http_utils
+
+KNOWN_CLASS_TYPES = ("LECTURE", "DISCUSSION", "LAB")
 
 # Term ID for the most recent term
 term_id = update_term_id()
@@ -27,9 +29,7 @@ def scrape_course_data(course_acronym, file):
     url = f"{base_url}?courseId={course_acronym}&sectionId=&termId={term_id}&creditCompare=%3E%3D&credits=0.0&courseLevelFilter=UGRAD&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on"
 
     # Fetch the web page
-    response = requests.get(url)
-    if response.status_code != 200:
-        return
+    response = http_utils.fetch(url)
 
     # Parse the HTML content
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -236,6 +236,13 @@ def update_classes_data(course_number, open_sections, class_name, file_path, cla
 
                 if class_type:
                     class_type = class_type.text.strip().upper()
+
+                    if class_type not in KNOWN_CLASS_TYPES:
+                        detail = f"{days} {start_time}-{end_time}" if has_specific_time else days
+                        note = f"{class_type}: {detail}"
+                        current = section_data["UNSPECIFIED TIME MESSAGE"]
+                        section_data["UNSPECIFIED TIME MESSAGE"] = f"{current}; {note}" if current else note
+                        continue
 
                     if section_data[f"HAS {class_type}"]:
                         class_type = f"2ND LISTED {class_type}"
