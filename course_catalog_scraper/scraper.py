@@ -1,4 +1,3 @@
-import requests
 from bs4 import BeautifulSoup
 from helping_files import helper, http_utils
 import csv
@@ -38,9 +37,11 @@ def scrape_course_data(course_acronym, file):
         }
 
 
-        course_title = course_block.find('p', class_='courseblocktitle noindent').strong.text.strip()
-        course_dict["COURSE NUMBER"], course_dict["NAME"], course_dict["CREDITS"] = helper.parse_course_string(course_title)
-        course_dict["DESCRIPTION"] = course_block.find('p', class_='courseblockdesc noindent').text.strip()
+        title = course_block.find('p', class_='courseblocktitle noindent')
+        if title is None or title.strong is None:
+            continue
+        course_dict["COURSE NUMBER"], course_dict["NAME"], course_dict["CREDITS"] = helper.parse_course_string(title.strong.text.strip())
+        course_dict["DESCRIPTION"] = helper.text_of(course_block, 'p', 'courseblockdesc noindent')
 
         extras = course_block.find_all('p', class_='courseblockextra noindent')
         for extra in extras:

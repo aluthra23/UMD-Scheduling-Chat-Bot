@@ -1,23 +1,12 @@
-import requests
-import time
 from bs4 import BeautifulSoup
 import csv
 import pandas as pd
 
+from helping_files import helper, http_utils
+
 
 def soc_scraper(file_path='umd_course_prefixes.csv'):
-    # URL of the University of Maryland's approved courses page
-    url = 'https://app.testudo.umd.edu/soc/'
-
-    # Send a GET request to the page
-    response = None
-    for attempt in range(3):
-        response = requests.get(url, timeout=30)
-        if response.ok:
-            break
-        if attempt < 2:
-            time.sleep(5 * (attempt + 1))
-    response.raise_for_status()
+    response = http_utils.fetch('https://app.testudo.umd.edu/soc/')
 
     # Parse the HTML content of the page
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -30,15 +19,14 @@ def soc_scraper(file_path='umd_course_prefixes.csv'):
         writer.writerow(['COURSE PREFIX', 'FULL FORM'])
 
         for entry in course_prefixes:
-            course_prefix = entry.find('span', class_='prefix-abbrev push_one two columns').text.strip()
-            full_form = entry.find('span', class_='prefix-name nine columns').text.strip()
-            writer.writerow([course_prefix, full_form])
+            course_prefix = helper.text_of(entry, 'span', 'prefix-abbrev push_one two columns')
+            full_form = helper.text_of(entry, 'span', 'prefix-name nine columns')
+            if course_prefix:
+                writer.writerow([course_prefix, full_form])
 
 
 def course_catalog_scraper(url: str, file_path='umd_course_prefixes.csv'):
-    # Send a GET request to the page
-    response = requests.get(url)
-    response.raise_for_status()  # Check that the request was successful
+    response = http_utils.fetch(url)
 
     # Parse the HTML content of the page
     soup = BeautifulSoup(response.content, 'html.parser')
@@ -57,10 +45,10 @@ def course_catalog_scraper(url: str, file_path='umd_course_prefixes.csv'):
 
             course_prefix, full_form = separate_course_prefix(course.text.strip())
 
-            if course_prefix not in existing_course_prefixes:
+            if full_form is not None and course_prefix not in existing_course_prefixes:
                 writer.writerow([course_prefix, full_form])
 
 
 def separate_course_prefix(full_course_prefix: str):
-    words = full_course_prefix.split(' - ')
-    return words[0], words[1]
+    prefix, separator, full_form = full_course_prefix.partition(' - ')
+    return (prefix.strip(), full_form.strip()) if separator else (prefix.strip(), None)

@@ -2,29 +2,35 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 import requests
 
-from term_utils import TERM_PATTERN
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from helping_files import http_utils  # noqa: E402
+from term_utils import TERM_PATTERN  # noqa: E402
+
+API_URL = "https://umd-courses-api-aluthra-705eb647.koyeb.app/v1/class_sections/CMSC351"
+# The API runs on Koyeb's free tier, which can take a while to wake up.
+API_TIMEOUT = (10, 90)
 
 
-def term_is_available(term_id: str) -> bool:
-    response = requests.get(
-        f"https://umd-courses-api-aluthra-705eb647.koyeb.app/v1/class_sections/CMSC351",
-        params={"term_id": term_id},
-        timeout=30,
-    )
-
-    if response.status_code == 404:
+def term_is_available(term_id: str, fetch=http_utils.fetch) -> bool:
+    try:
+        response = fetch(f"{API_URL}?term_id={term_id}", timeout=API_TIMEOUT)
+    except requests.HTTPError as error:
+        response = error.response
+        if response is None or response.status_code != 404:
+            raise
         try:
             body = response.json()
-        except ValueError as error:
-            raise RuntimeError("Availability endpoint returned an invalid 404 response") from error
+        except ValueError as parse_error:
+            raise RuntimeError("Availability endpoint returned an invalid 404 response") from parse_error
         if body == {"detail": "Course not found!"}:
             return False
-        raise RuntimeError(f"Unexpected 404 response: {body!r}")
+        raise RuntimeError(f"Unexpected 404 response: {body!r}") from error
 
-    response.raise_for_status()
     data = response.json()
     if not isinstance(data, list) or not data:
         raise RuntimeError(f"Availability endpoint returned no sections for {term_id}")

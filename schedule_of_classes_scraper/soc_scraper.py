@@ -1,5 +1,4 @@
 import pandas as pd
-import requests
 from bs4 import BeautifulSoup
 import csv
 from term_id_functions import update_term_id
@@ -8,7 +7,6 @@ from helping_files import helper, http_utils
 
 KNOWN_CLASS_TYPES = ("LECTURE", "DISCUSSION", "LAB")
 
-# Term ID for the most recent term
 term_id = update_term_id()
 
 # Base URL for the UMD schedule of classes search
@@ -37,23 +35,16 @@ def scrape_course_data(course_acronym, file):
     courses = soup.find_all('div', class_='course')
 
     for course in courses:
-        course_number = course.find('div', class_='course-id').text.strip()
+        course_number = helper.text_of(course, 'div', 'course-id')
+        if not course_number:
+            continue
 
-        section_title = course.find('span', class_='course-title').text.strip()
-
-        section_min_credits = course.find('span', class_='course-min-credits')
-        if section_min_credits:
-            section_min_credits = int(section_min_credits.text.strip())
-
-            section_max_credits = course.find('span', class_='course-max-credits')
-            if section_max_credits:
-                section_max_credits = int(section_max_credits.text.strip())
-            else:
-                section_max_credits = section_min_credits
-
-        section_grading = str(course.find('span', class_='grading-method').text).strip()
-
-        ## DO DESCRIPTION AS WELL
+        section_title = helper.text_of(course, 'span', 'course-title')
+        section_min_credits = helper.parse_int(helper.text_of(course, 'span', 'course-min-credits'))
+        section_max_credits = helper.parse_int(helper.text_of(course, 'span', 'course-max-credits'))
+        if section_max_credits is None:
+            section_max_credits = section_min_credits
+        section_grading = helper.text_of(course, 'span', 'grading-method')
 
         description_fields = {
             "GEN_EDS FULFILLED": "",
@@ -184,45 +175,35 @@ def update_classes_data(course_number, open_sections, class_name, file_path, cla
                 section_data["IS BLENDED (NORMAL AND ONLINE)"] = 1
 
 
-            section_id = str(section.find('span', class_='section-id').text).strip()
+            section_id = helper.text_of(section, 'span', 'section-id')
+            if not section_id:
+                continue
             section_data["SECTION ID"] = section_id
 
-            section_instructor = str(section.find('span', class_='section-instructor').text).strip()
-            section_data["INSTRUCTOR"] = section_instructor
+            instructors = [span.text.strip() for span in section.find_all('span', class_='section-instructor') if span.text.strip()]
+            section_data["INSTRUCTOR"] = ", ".join(instructors) or None
 
-            total_seats = str(section.find('span', class_='total-seats-count').text).strip()
-            section_data["TOTAL SEATS"] = total_seats
+            section_data["TOTAL SEATS"] = helper.text_of(section, 'span', 'total-seats-count')
+            section_data["OPEN SEATS"] = helper.text_of(section, 'span', 'open-seats-count')
+            section_data["WAITLIST COUNT"] = helper.text_of(section, 'span', 'waitlist-count') or "0"
 
-            open_seats = str(section.find('span', class_='open-seats-count').text).strip()
-            section_data["OPEN SEATS"] = open_seats
+            times_container = section.find('div', class_="class-days-container")
+            times = times_container.find_all('div', class_='row') if times_container else []
 
-            waitlist = section.find('span', class_='waitlist-count')
-            section_data["WAITLIST COUNT"] = waitlist.text.strip() if waitlist else "0"
-
-            times = section.find('div', class_="class-days-container")
-            times = times.find_all('div', class_='row')
-
-            # Iterating through class-days-container
-            for i, time in enumerate(times):
-                days = time.find('span', class_='section-days')
+            for time in times:
+                days = helper.text_of(time, 'span', 'section-days')
                 has_specific_time = False
                 start_time = ""
                 end_time = ""
 
                 if days:
-                    days = days.text.strip()
-
-                    if str(days).upper().find("TBA") != -1:
+                    start_time = helper.text_of(time, 'span', 'class-start-time')
+                    end_time = helper.text_of(time, 'span', 'class-end-time')
+                    if "TBA" in days.upper() or not (start_time and end_time):
                         section_data["UNSPECIFIED TIME MESSAGE"] = days
                     else:
-                        start_time = time.find('span', class_='class-start-time').text.strip()
-                        end_time = time.find('span', class_='class-end-time').text.strip()
                         has_specific_time = True
-
-                    class_type = time.find('div', class_='two columns')
-                    room = time.find('span', class_='class-building')
                 else:
-                    # Usage
                     message = find_message_div(time)
                     if message is None:
                         # Handle case where no matching div was found

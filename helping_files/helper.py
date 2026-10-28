@@ -1,3 +1,23 @@
+import re
+
+
+def text_of(element, tag, class_name):
+    """Stripped text of the first matching child, or None when it is missing or empty."""
+    if element is None:
+        return None
+    found = element.find(tag, class_=class_name)
+    if found is None:
+        return None
+    text = found.text.strip()
+    return text or None
+
+
+def parse_int(text):
+    try:
+        return int(str(text).strip())
+    except (TypeError, ValueError):
+        return None
+
 
 def parse_course_string(course_string):
     # Split the string by spaces
@@ -16,10 +36,9 @@ def parse_course_string(course_string):
 
 
 def remove_period_end(string):
-    if string[-1] == '.':
+    if string and string.endswith('.'):
         return string[:-1]
-    else:
-        return string
+    return string
 
 
 def parse_extra(example_string):
@@ -42,12 +61,6 @@ def string_without_delimiter(input_string, delimiter):
         return before, remove_period_end(after)
     else:
         return input_string, None
-
-
-import re
-
-
-import re
 
 
 def extract_link_from_html(html_content):

@@ -1,4 +1,6 @@
 import os
+import uuid
+from datetime import datetime, timezone
 
 from fastembed import TextEmbedding
 from qdrant_client import QdrantClient
@@ -17,6 +19,8 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 class QdrantManager:
     EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
     EMBEDDING_DIMENSIONS = 384
+    # One point per term, read by the chat UI to show when that term was last synced.
+    SYNC_STATUS_COLLECTION = "sync_status"
 
     def __init__(self, qdrant_api_key: str, host: str = "localhost"):
         self.client = QdrantClient(url=host, api_key=qdrant_api_key)
@@ -70,3 +74,19 @@ class QdrantManager:
     def delete_points(self, collection_name: str, point_ids: list[str]):
         if point_ids:
             self.client.delete(collection_name=collection_name, points_selector=PointIdsList(points=point_ids))
+
+    def record_sync(self, collection_name: str, **stats):
+        if not self.client.collection_exists(self.SYNC_STATUS_COLLECTION):
+            self.client.create_collection(
+                collection_name=self.SYNC_STATUS_COLLECTION,
+                vectors_config=VectorParams(size=1, distance=Distance.DOT),
+            )
+        self.client.upsert(collection_name=self.SYNC_STATUS_COLLECTION, points=[PointStruct(
+            id=str(uuid.uuid5(uuid.NAMESPACE_URL, f"umd-sync-status:{collection_name}")),
+            vector=[1.0],
+            payload={
+                "collection": collection_name,
+                "synced_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                **stats,
+            },
+        )])

@@ -62,6 +62,61 @@ class ClassTypeTests(unittest.TestCase):
         self.assertIn("SEMINAR: MWF 9:00am-9:50am", row["UNSPECIFIED TIME MESSAGE"])
 
 
+COURSES_HTML = """
+<div class="course">
+  <div class="course-id">TEST101</div><span class="course-title">Has Credits</span>
+  <span class="course-min-credits">4</span><span class="grading-method">Reg</span>
+  <div class="section delivery-f2f">
+    <span class="section-id">0101</span>
+    <span class="section-instructor">Sujeong Kim</span><span class="section-instructor">William Regli</span>
+    <span class="total-seats-count">30</span><span class="open-seats-count">10</span>
+    <div class="class-days-container"><div class="row">
+      <span class="section-days">TuTh</span><span class="class-start-time">2:00pm</span><span class="class-end-time">3:15pm</span>
+    </div></div>
+  </div>
+</div>
+<div class="course">
+  <div class="course-id">TEST102</div><span class="course-title">No Credits Listed</span>
+  <div class="section delivery-online"><span class="section-id">FC01</span></div>
+</div>
+<div class="course"><span class="course-title">Missing course id is skipped</span></div>
+"""
+
+
+class ScheduleScraperTests(unittest.TestCase):
+    def scrape(self):
+        response = requests.Response()
+        response.status_code = 200
+        response._content = COURSES_HTML.encode()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "out.csv"
+            with open(path, "w", newline="") as file, mock.patch.object(soc_scraper.http_utils, "fetch", return_value=response):
+                soc_scraper.scrape_course_data("TEST", file)
+            with open(path, newline="") as file:
+                return {row["COURSE NUMBER"]: row for row in (dict(zip(_columns(), values)) for values in csv.reader(file))}
+
+    def test_keeps_every_instructor(self):
+        self.assertEqual(self.scrape()["TEST101"]["INSTRUCTOR"], "Sujeong Kim, William Regli")
+
+    def test_max_credits_defaults_to_min(self):
+        row = self.scrape()["TEST101"]
+        self.assertEqual((row["MINIMUM CREDITS"], row["MAXIMUM CREDITS"]), ("4", "4"))
+
+    def test_credits_do_not_leak_into_the_next_course(self):
+        row = self.scrape()["TEST102"]
+        self.assertEqual((row["MINIMUM CREDITS"], row["MAXIMUM CREDITS"]), ("", ""))
+
+    def test_missing_fields_do_not_crash(self):
+        row = self.scrape()["TEST102"]
+        self.assertEqual(row["SECTION ID"], "FC01")
+        self.assertEqual(row["INSTRUCTOR"], "")
+        self.assertEqual(row["WAITLIST COUNT"], "0")
+        self.assertEqual(row["IS ONLINE"], "1")
+
+    def test_course_without_id_is_skipped(self):
+        self.assertEqual(set(self.scrape()), {"TEST101", "TEST102"})
+
+
 class GenEdTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
