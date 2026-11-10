@@ -38,7 +38,7 @@ A separate `sync_status` collection holds one point per term, with the time of i
 
 ## GitHub Actions workflow
 
-`.github/workflows/upload-next-term.yml` is scheduled for minute `17` of every hour (UTC). GitHub throttles scheduled workflows, so in practice it runs every few hours. It needs these repository Actions secrets:
+`.github/workflows/upload-next-term.yml` is scheduled for minute `42` of every hour (UTC). GitHub throttles scheduled workflows, so in practice it runs every few hours: from late September to early November 2026 it averaged 4–5 runs a day, about 5 hours apart, whatever minute was chosen. It needs these repository Actions secrets:
 
 - `QDRANT_API_KEY`
 - `QDRANT_LINK`
@@ -140,3 +140,7 @@ The Schedule of Classes scrapers parse Testudo the same way but produce differen
 ## Notes for maintainers
 
 Do not change the embedding model, precision, or document format without re-syncing every collection the chat app uses. The chat app's deployment needs the same Qdrant endpoint and key, plus its Gemini API key. Never commit credentials.
+
+## Backlog
+
+- **Reliable hourly runs with an external trigger.** GitHub skips most scheduled runs, but it doesn't skip runs started through its API. A free cron service such as [cron-job.org](https://cron-job.org) could start this workflow every hour by sending `POST https://api.github.com/repos/aluthra23/UMD-Scheduling-Chat-Bot/actions/workflows/upload-next-term.yml/dispatches` with the body `{"ref":"main"}` and the headers `Authorization: Bearer <token>` and `Accept: application/vnd.github+json`. The token would be a fine-grained personal access token limited to this repository, with only the **Actions: read and write** permission. Keep the `schedule:` trigger as a fallback. This is on hold because it means trusting the cron service with that token. The same approach works for any other repository whose scheduled workflows run too rarely.

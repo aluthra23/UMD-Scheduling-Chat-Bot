@@ -3,7 +3,7 @@ name: Refresh current or upload next UMD term
 on:
   schedule:
     # Requested hourly; GitHub throttles scheduled runs, so in practice it runs every few hours.
-    - cron: '17 * * * *'
+    - cron: '42 * * * *'
   workflow_dispatch:
     inputs:
       term_id:
