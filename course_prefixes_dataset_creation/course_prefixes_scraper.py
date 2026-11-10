@@ -5,24 +5,28 @@ import pandas as pd
 from helping_files import helper, http_utils
 
 
-def soc_scraper(file_path='umd_course_prefixes.csv'):
-    response = http_utils.fetch('https://app.testudo.umd.edu/soc/')
+def soc_scraper(file_path='umd_course_prefixes.csv', term_id=None):
+    """Write Testudo's course prefixes for term_id (Testudo's default term when None) to file_path.
 
-    # Parse the HTML content of the page
+    Raises without touching the file if Testudo lists no prefixes, e.g. for a term that isn't published.
+    """
+    url = f'https://app.testudo.umd.edu/soc/{term_id}' if term_id else 'https://app.testudo.umd.edu/soc/'
+    response = http_utils.fetch(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # Find all course prefixes and their descriptions
-    course_prefixes = soup.find_all('div', class_='course-prefix row')
+    rows = []
+    for entry in soup.find_all('div', class_='course-prefix row'):
+        course_prefix = helper.text_of(entry, 'span', 'prefix-abbrev push_one two columns')
+        full_form = helper.text_of(entry, 'span', 'prefix-name nine columns')
+        if course_prefix:
+            rows.append([course_prefix, full_form])
+    if not rows:
+        raise RuntimeError(f"Testudo listed no course prefixes at {url}")
 
     with open(file_path, 'w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['COURSE PREFIX', 'FULL FORM'])
-
-        for entry in course_prefixes:
-            course_prefix = helper.text_of(entry, 'span', 'prefix-abbrev push_one two columns')
-            full_form = helper.text_of(entry, 'span', 'prefix-name nine columns')
-            if course_prefix:
-                writer.writerow([course_prefix, full_form])
+        writer.writerows(rows)
 
 
 def course_catalog_scraper(url: str, file_path='umd_course_prefixes.csv'):

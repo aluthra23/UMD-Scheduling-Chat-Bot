@@ -28,6 +28,8 @@ For example, `202701` is Spring 2027. Each collection holds four kinds of docume
 | `prefix` | Course prefix, such as `CMSC` | Testudo and the catalog |
 | `gen_ed` | Gen-ed category | Testudo |
 
+Catalog documents include every "Label: value" line the catalog lists under a course: prerequisites, restrictions, `FORMERLY NAMED`, `CROSS-LISTED` (cross-listed and jointly offered courses), `REPEATABLE TO`, and so on. Lines with any other label go to `ADDITIONAL INFORMATION`, label included. Repeated meetings of one type fill the `2ND LISTED` and `3RD LISTED` columns; any beyond those are written to `UNSPECIFIED TIME MESSAGE` rather than overwriting an earlier meeting.
+
 Each document's payload has `text`, `source`, `course_number` (indexed, so the chat app can filter by course), `document_key`, and `content_hash`. Schedule documents leave out the per-section `HAS …` / `IS …` 0/1 columns and use a single `DELIVERY:` field (`Face-to-face`, `Blended` or `Online`) instead. That keeps most sections inside the embedding model's 256-token limit.
 
 Vectors are FP32 `sentence-transformers/all-MiniLM-L6-v2` embeddings with 384 dimensions, made with FastEmbed. The chat app embeds questions with the same model in the browser. Both sides produce identical vectors, so never change the model on only one side.
@@ -50,6 +52,8 @@ On every run it:
 
 Only the newest term is refreshed. Older term collections stay as they were when the next term appeared.
 
+GitHub disables scheduled workflows in a public repository after 60 days without repository activity, so commit something at least every couple of months, or re-enable the workflow from the **Actions** tab. Commits don't make scheduled runs more frequent. If every run fails within seconds with "The job was not started because your account is locked due to a billing issue", fix the billing problem under GitHub's **Settings → Billing**. Public-repository Actions minutes are free, but GitHub won't start jobs while the account is locked.
+
 To run it manually, open the repository's **Actions** tab and choose **Run workflow**. Leave the term blank for the normal behaviour, or enter a term ID to refresh that collection.
 
 The embedding model is cached between runs in `.cache/fastembed`, via `FASTEMBED_CACHE_PATH`.
@@ -66,7 +70,7 @@ Several safeguards stop a bad scrape from wiping data:
 
 - Every request to UMD's websites goes through `helping_files/http_utils.fetch`. It retries timeouts, connection errors, 429s, and 5xx responses, and raises once retries run out. A failed page is never mistaken for an empty one.
 - Before deleting anything, `main.py` refuses to remove more than 25% of a source's documents (or all of them) unless you pass `--allow-mass-delete`.
-- The gen-ed scraper only rewrites `gen_eds.csv` after a successful scrape, and fails if it finds no categories.
+- The gen-ed and course-prefix scrapers only rewrite their CSVs after a successful scrape, and fail if they find no entries.
 - CSVs are read as text, so IDs like section `0101` are never turned into numbers.
 
 A collection created before incremental metadata existed is rebuilt once on its first sync. Pass `--recreate` to force a rebuild.
@@ -115,7 +119,7 @@ The tests cover the retrying fetch, the deletion guard, term-date logic, documen
 
 ## Important files
 
-- `scripts/scrape_and_upload.py`: runs every scraper, then syncs one term.
+- `scripts/scrape_and_upload.py`: runs every scraper, then syncs one term. It scrapes the term's course prefixes first (Testudo's list for that term plus catalog-only prefixes), and the schedule and catalog scrapers then read that one list.
 - `scripts/next_term.py`: finds the newest uploaded term and the term after it.
 - `scripts/check_term.py`: asks the UMD Courses API whether a term is published.
 - `main.py`: builds documents and runs the incremental sync.

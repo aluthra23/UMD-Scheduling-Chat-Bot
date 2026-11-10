@@ -53,6 +53,50 @@ def parse_extra(example_string):
 
     return label, description
 
+# Labels of the "Label: value" lines under each Academic Catalog course, and the field each fills.
+CATALOG_EXTRA_FIELDS = {
+    "PREREQUISITE": "PREREQUISITE",
+    "COREQUISITE": "COREQUISITE",
+    "RESTRICTION": "RESTRICTION",
+    "RECOMMENDED": "RECOMMENDED",
+    "CREDIT ONLY GRANTED FOR": "CREDIT ONLY GRANTED FOR",
+    "REPEATABLE TO": "REPEATABLE TO",
+    "FORMERLY": "FORMERLY NAMED",
+    "CROSS-LISTED WITH": "CROSS-LISTED",
+    "JOINTLY OFFERED WITH": "CROSS-LISTED",
+    "ADDITIONAL INFORMATION": "ADDITIONAL INFORMATION",
+}
+
+
+def catalog_extra_fields(lines):
+    """Map a catalog course's extra lines ("Formerly: ENGL289M.") to fields.
+
+    Repeated fields are joined with "; ", and lines with an unknown label go to ADDITIONAL INFORMATION
+    with their label kept, so nothing on the page is silently dropped.
+    """
+    fields = {}
+
+    def add(field, value):
+        if value:
+            fields[field] = f"{fields[field]}; {value}" if fields.get(field) else value
+
+    for line in lines:
+        line = " ".join(line.split())
+        if ":" in line:
+            label, value = parse_extra(line)
+        else:
+            label, value = "", line
+        value, cross_listed = string_without_delimiter(remove_period_end(value), "Cross-listed with")
+        value = remove_period_end(value)
+        field = CATALOG_EXTRA_FIELDS.get(label.upper())
+        if field is None:
+            field = "ADDITIONAL INFORMATION"
+            value = f"{label}: {value}" if label and value else value
+        add(field, value)
+        add("CROSS-LISTED", cross_listed.lstrip(": ") if cross_listed else None)
+    return fields
+
+
 def string_without_delimiter(input_string, delimiter):
     index = input_string.lower().find(delimiter.lower())
     if index != -1:

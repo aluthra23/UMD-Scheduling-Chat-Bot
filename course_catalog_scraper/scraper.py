@@ -1,73 +1,34 @@
 from bs4 import BeautifulSoup
-from helping_files import helper, http_utils
+from helping_files import constants, helper, http_utils
 import csv
+
+BASE_URL = "https://academiccatalog.umd.edu/undergraduate/approved-courses/"
+
+
+def parse_course_block(course_acronym, course_block):
+    """One catalog course as a dict keyed by CSV_CATALOG_COURSES_HEADER, or None if it has no title."""
+    title = course_block.find('p', class_='courseblocktitle noindent')
+    if title is None or title.strong is None:
+        return None
+
+    course = dict.fromkeys(constants.CSV_CATALOG_COURSES_HEADER)
+    course["COURSE PREFIX"] = course_acronym
+    course["COURSE NUMBER"], course["NAME"], course["CREDITS"] = helper.parse_course_string(title.strong.text.strip())
+    course["DESCRIPTION"] = helper.text_of(course_block, 'p', 'courseblockdesc noindent')
+
+    extras = [extra.text for extra in course_block.find_all('p', class_='courseblockextra noindent')]
+    course.update(helper.catalog_extra_fields(extras))
+    return course
 
 
 def scrape_course_data(course_acronym, file):
-    base_url = "https://academiccatalog.umd.edu/undergraduate/approved-courses/"
-    url = f"{base_url}{course_acronym.lower()}/"
-
-    response = http_utils.fetch(url, allow_not_found=True)
+    response = http_utils.fetch(f"{BASE_URL}{course_acronym.lower()}/", allow_not_found=True)
     if response is None:
         return
 
-    # Parse the HTML content
     soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Find all courses listed on the page
-    courses = soup.find_all('div', class_='courseblock')
-
-    # Iterate over each course and extract details
-    for course_block in courses:
-        course_dict = {
-            "COURSE PREFIX" : course_acronym,
-            "COURSE NUMBER": None,
-            "NAME": None,
-            "CREDITS": None,
-            "DESCRIPTION": None,
-            "PREREQUISITE": None,
-            "RESTRICTION": None,
-            "FORMERLY NAMED": None,
-            "RECOMMENDED": None,
-            "CREDIT ONLY GRANTED FOR": None,
-            "REPEATABLE TO": None,
-            "CROSS-LISTED": None,
-            'COREQUISITE': None
-            # Add more keys for other miscellaneous data if needed
-        }
-
-
-        title = course_block.find('p', class_='courseblocktitle noindent')
-        if title is None or title.strong is None:
-            continue
-        course_dict["COURSE NUMBER"], course_dict["NAME"], course_dict["CREDITS"] = helper.parse_course_string(title.strong.text.strip())
-        course_dict["DESCRIPTION"] = helper.text_of(course_block, 'p', 'courseblockdesc noindent')
-
-        extras = course_block.find_all('p', class_='courseblockextra noindent')
-        for extra in extras:
-            extra_description = extra.text
-            label, description = helper.parse_extra(extra_description)
-
-            if course_dict["CROSS-LISTED"]:
-                course_dict[label.upper()] = helper.remove_period_end(description)
-            else:
-                course_dict[label.upper()], course_dict["CROSS-LISTED"] = (
-                    helper.string_without_delimiter(helper.remove_period_end(description), "Cross-listed with") )
-
-        writer = csv.writer(file)
-        writer.writerow([
-            course_dict["COURSE PREFIX"],
-            course_dict["COURSE NUMBER"],
-            course_dict["NAME"],
-            course_dict["CREDITS"],
-            course_dict["DESCRIPTION"],
-            course_dict["PREREQUISITE"],
-            course_dict["RESTRICTION"],
-            course_dict["FORMERLY NAMED"],
-            course_dict["RECOMMENDED"],
-            course_dict["CREDIT ONLY GRANTED FOR"],
-            course_dict["REPEATABLE TO"],
-            course_dict["CROSS-LISTED"],
-            course_dict["COREQUISITE"]
-            # Add more fields as needed
-        ])
+    writer = csv.writer(file)
+    for course_block in soup.find_all('div', class_='courseblock'):
+        course = parse_course_block(course_acronym, course_block)
+        if course:
+            writer.writerow([course[column] for column in constants.CSV_CATALOG_COURSES_HEADER])

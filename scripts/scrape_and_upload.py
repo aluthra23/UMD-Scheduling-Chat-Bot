@@ -31,6 +31,8 @@ def main() -> None:
     env["PYTHONPATH"] = str(ROOT) + os.pathsep + env.get("PYTHONPATH", "")
     python = sys.executable
 
+    # Prefixes first: the schedule and catalog scrapers both read the list it writes.
+    run([python, "main_course_prefixes_scraper.py"], cwd=ROOT / "course_prefixes_dataset_creation", env=env)
     run([python, "main_soc_scraper.py"], cwd=ROOT / "schedule_of_classes_scraper", env=env)
     run([python, "main_catalog_scraper.py"], cwd=ROOT / "course_catalog_scraper", env=env)
     run([python, "main_gen_ed.py"], cwd=ROOT / "gen_eds", env=env)

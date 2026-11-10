@@ -23,6 +23,28 @@ def find_message_div(time):
     return None
 
 
+def free_meeting_slot(section_data, class_type):
+    """The first unused CSV slot for a meeting type ("LAB", then "2ND LISTED LAB", ...), or None."""
+    if class_type not in KNOWN_CLASS_TYPES:
+        return None
+    for ordinal in ("", "2ND LISTED ", "3RD LISTED "):
+        slot = f"{ordinal}{class_type}"
+        if section_data.get(f"HAS {slot}") == 0:
+            return slot
+    return None
+
+
+def room_text(room):
+    """'ESJ 0202', just the building, or the raw text (e.g. 'ONLINE') of a class-building span."""
+    if room is None:
+        return None
+    building = helper.text_of(room, 'span', 'building-code')
+    if not building:
+        return room.text.strip() or None
+    room_number = helper.text_of(room, 'span', 'class-room')
+    return f"{building} {room_number}" if room_number else building
+
+
 def scrape_course_data(course_acronym, file):
     url = f"{base_url}?courseId={course_acronym}&sectionId=&termId={term_id}&creditCompare=%3E%3D&credits=0.0&courseLevelFilter=UGRAD&instructor=&_facetoface=on&_blended=on&_online=on&courseStartCompare=&courseStartHour=&courseStartMin=&courseStartAM=&courseEndHour=&courseEndMin=&courseEndAM=&teachingCenter=ALL&_classDay1=on&_classDay2=on&_classDay3=on&_classDay4=on&_classDay5=on"
 
@@ -213,49 +235,22 @@ def update_classes_data(course_number, open_sections, class_name, file_path, cla
                     days = message
 
                 class_type = time.find('div', class_='two columns')
-                room = time.find('span', class_='class-building')
+                class_type = class_type.text.strip().upper() if class_type else "LECTURE"
+                detail = f"{days} {start_time}-{end_time}" if has_specific_time else days
+                room = room_text(time.find('span', class_='class-building'))
 
-                if class_type:
-                    class_type = class_type.text.strip().upper()
+                slot = free_meeting_slot(section_data, class_type)
+                if slot is None:
+                    # An unusual type (e.g. SEMINAR), or more meetings of a type than the CSV has columns for.
+                    note = f"{class_type}: {detail}" + (f" in {room}" if room else "")
+                    current = section_data["UNSPECIFIED TIME MESSAGE"]
+                    section_data["UNSPECIFIED TIME MESSAGE"] = f"{current}; {note}" if current else note
+                    continue
 
-                    if class_type not in KNOWN_CLASS_TYPES:
-                        detail = f"{days} {start_time}-{end_time}" if has_specific_time else days
-                        note = f"{class_type}: {detail}"
-                        current = section_data["UNSPECIFIED TIME MESSAGE"]
-                        section_data["UNSPECIFIED TIME MESSAGE"] = f"{current}; {note}" if current else note
-                        continue
-
-                    if section_data[f"HAS {class_type}"]:
-                        class_type = f"2ND LISTED {class_type}"
-                else:
-                    class_type = "LECTURE"
-
-                    if section_data["HAS LECTURE"] and class_type == "LECTURE":
-                        class_type = "2ND LISTED LECTURE"
-
-                        if section_data[f"HAS {class_type}"]:
-                            class_type = "3RD LISTED LECTURE"
-
-                section_data[f"HAS {class_type}"] = 1
-
-                if has_specific_time:
-                    section_data[f"{class_type} TIME"] = f"{days} {start_time}-{end_time}"
-                else:
-                    section_data[f"{class_type} TIME"] = days
-
+                section_data[f"HAS {slot}"] = 1
+                section_data[f"{slot} TIME"] = detail
                 if room:
-                    building = room.find('span', class_='building-code')
-                    if building:
-                        building = building.text.strip()
-                        room_number = room.find('span', class_='class-room')
-
-                        if room_number:
-                            room_number = room_number.text.strip()
-                            section_data[f"{class_type} ROOM"] = f"{building} {room_number}"
-                        else:
-                            section_data[f"{class_type} ROOM"] = building
-                    else:
-                        section_data[f"{class_type} ROOM"] = room.text.strip()
+                    section_data[f"{slot} ROOM"] = room
 
             # Iterating through section-texts-container
             restrictions = section.find('div', class_="section-texts-container")
